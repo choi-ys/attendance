@@ -1,9 +1,9 @@
 package io.sample.attendance.domain;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.temporal.ChronoUnit;
 import lombok.Getter;
 
 @Getter
@@ -12,6 +12,7 @@ public class Attendance {
     public static final int DAILY_STATUTORY_ACTUAL_WORKING_HOUR = 8;
     public static final int MAX_BREAK_TIME_HOUR = 1;
     public static final int DAILY_STATUTORY_WORKING_HOUR = DAILY_STATUTORY_ACTUAL_WORKING_HOUR + MAX_BREAK_TIME_HOUR;
+    public static final int DAILY_STATUTORY_WORKING_MINUTE = 540;
 
     private LocalDateTime startAt;
     private LocalDateTime endAt;
@@ -23,11 +24,16 @@ public class Attendance {
 
     public static Attendance of(LocalTime startTime, LocalTime endTime) {
         validateCommuteTime(startTime, endTime);
-        LocalDate startDate = LocalDate.now();
+        LocalDate today = LocalDate.now();
+        LocalDate endDate = getEndDate(startTime, endTime);
+        return new Attendance(LocalDateTime.of(today, startTime), LocalDateTime.of(endDate, endTime));
+    }
+
+    private static LocalDate getEndDate(LocalTime startTime, LocalTime endTime) {
         if (isNextDayEnd(startTime, endTime)) {
-            startDate = startDate.plusDays(1);
+            return LocalDate.now().plusDays(1);
         }
-        return new Attendance(LocalDateTime.of(startDate, startTime), LocalDateTime.of(startDate, endTime));
+        return LocalDate.now();
     }
 
     private static void validateCommuteTime(LocalTime startTime, LocalTime endTime) {
@@ -41,20 +47,14 @@ public class Attendance {
     }
 
     public LocalTime getWorkingTime() {
-        int workingTimeByMinute = getTotalWorkingTimeByMinute();
-        int workingHour = workingTimeByMinute / 60;
-        int workingMinute = workingTimeByMinute % 60;
-        if (hasBreakTime(workingHour)) {
-            workingHour -= MAX_BREAK_TIME_HOUR;
+        Duration between = Duration.between(startAt, endAt);
+        if (hasBreakTime(between)) {
+            between = between.minusHours(MAX_BREAK_TIME_HOUR);
         }
-        return LocalTime.of(workingHour, workingMinute);
+        return LocalTime.of(between.toHoursPart(), between.toMinutesPart());
     }
 
-    private int getTotalWorkingTimeByMinute() {
-        return (int) ChronoUnit.MINUTES.between(startAt, endAt);
-    }
-
-    private boolean hasBreakTime(int workingHour) {
-        return workingHour >= DAILY_STATUTORY_WORKING_HOUR;
+    private boolean hasBreakTime(Duration between) {
+        return between.toHours() >= DAILY_STATUTORY_WORKING_HOUR;
     }
 }

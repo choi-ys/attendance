@@ -30,7 +30,7 @@ class AttendanceTest {
 
         // Then
         assertAll(
-            () -> assertThat(given.getStartAt()).isEqualTo(LocalDateTime.of(expectedDate, startTime)),
+            () -> assertThat(given.getStartAt()).isEqualTo(LocalDateTime.of(LocalDate.now(), startTime)),
             () -> assertThat(given.getEndAt()).isEqualTo(LocalDateTime.of(expectedDate, endTime))
         );
     }
