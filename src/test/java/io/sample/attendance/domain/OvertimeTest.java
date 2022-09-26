@@ -34,7 +34,7 @@ class OvertimeTest {
         assertAll(
             () -> assertThat(given.getStartTime()).isEqualTo(expectedOvertimeStartTime),
             () -> assertThat(given.getEndTime()).isEqualTo(expectedOvertimeEndTime),
-            () -> assertThat(given.getDuration()).isEqualTo(expectedOvertimeDuration),
+            () -> assertThat(given.getWorkingTime()).isEqualTo(expectedOvertimeDuration),
             () -> assertThat(given.getExtraPay()).isEqualTo(expectedExtraPay)
         );
     }

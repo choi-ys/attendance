@@ -54,35 +54,75 @@ class AttendanceTest {
             .isThrownBy(() -> Attendance.of(localTime, localTime));
     }
 
-    @ParameterizedTest(name = "[Case#{index}] {0} : 출/퇴근 시간 : {1} ~ {2}, 실 근무 시간 : {3}")
+    @ParameterizedTest(name = "[Case#{index}] {0} : 출/퇴근 시간 : {1} ~ {2}, 급여 총액 : {3}, 총 근로 시간 : {4}, "
+        + "연장 근무 시간 : {5}, {6} ~ {7}, 연장 근로 수당 : {8}, "
+        + "야간 근무 시간 : {9}, {10} ~ {11}, 야간 근로 수당 : {12}")
     @MethodSource
-    @DisplayName("출/퇴근 시간으로부터 총 근무 시간 산출")
-    public void getTotalWorkingTime(
+    @DisplayName("출/퇴근 시간으로부터 일일 급여 명세서 산출")
+    public void dailyPayStub(
         final String testCaseDescription,
         final LocalTime startTime,
         final LocalTime endTime,
-        final LocalTime expectedWorkingTime
+        final int expectedTotalPay,
+        final LocalTime expectedWorkingTime,
+        final LocalTime expectedOvertimeWorkingTime,
+        final LocalTime expectedOvertimeStartAt,
+        final LocalTime expectedOvertimeEndAt,
+        final int expectedOvertimeExtraPay,
+        final LocalTime expectedNightShiftWorkingTime,
+        final LocalTime expectedNightShiftStartAt,
+        final LocalTime expectedNightShiftEndAt,
+        final int expectedNightShiftExtraPay
     ) {
         // given
         Attendance given = Attendance.of(startTime, endTime);
 
         // When & Then
-        assertThat(given.getWorkingTime()).isEqualTo(expectedWorkingTime);
+        assertAll(
+            () -> assertThat(given.getStartAt().toLocalTime()).as("출근 시간").isEqualTo(startTime),
+            () -> assertThat(given.getEndAt().toLocalTime()).as("퇴근 시간").isEqualTo(endTime),
+            () -> assertThat(given.getTotalPay()).as("급여 총액").isEqualTo(expectedTotalPay),
+            () -> assertThat(given.getWorkingTime()).as("총 근무 시간").isEqualTo(expectedWorkingTime),
+            () -> assertThat(given.getOvertimeWorkingTime()).as("연장 근무 시간").isEqualTo(expectedOvertimeWorkingTime),
+            () -> assertThat(given.getOvertimeStartAt()).as("연장 근무 시작 시간").isEqualTo(expectedOvertimeStartAt),
+            () -> assertThat(given.getOvertimeEndAt()).as("연장 근무 종료 시간").isEqualTo(expectedOvertimeEndAt),
+            () -> assertThat(given.getOvertimeExtraPay()).as("연장 근로 수당").isEqualTo(expectedOvertimeExtraPay),
+            () -> assertThat(given.getNightShiftWorkingTime()).as("야간 근무 시간").isEqualTo(expectedNightShiftWorkingTime),
+            () -> assertThat(given.getNightShiftStartAt()).as("야간 근로 시작 시간").isEqualTo(expectedNightShiftStartAt),
+            () -> assertThat(given.getNightShiftEndAt()).as("야간 근로 종료 시간").isEqualTo(expectedNightShiftEndAt),
+            () -> assertThat(given.getNightShiftExtraPay()).as("야간 근로 수당").isEqualTo(expectedNightShiftExtraPay)
+        );
     }
 
-    private static Stream<Arguments> getTotalWorkingTime() {
+    private static Stream<Arguments> dailyPayStub() {
         return Stream.of(
             Arguments.of(
-                "근로 시간이 9시간 미만인 경우",
-                LocalTime.of(9, 0),
-                LocalTime.of(17, 0),
-                LocalTime.of(8, 0)
+                "연장/야간 근무가 없는 근무",
+                LocalTime.of(9, 0), LocalTime.of(18, 0),
+                80000, LocalTime.of(8, 0),
+                LocalTime.of(0, 0), LocalTime.of(0, 0), LocalTime.of(0, 0), 0,
+                LocalTime.of(0, 0), LocalTime.of(0, 0), LocalTime.of(0, 0), 0
             ),
             Arguments.of(
-                "근로 시간이 9시간 이상인 경우",
-                LocalTime.of(9, 0),
-                LocalTime.of(18, 0),
-                LocalTime.of(8, 0)
+                "연장 근무가 포함된 근무",
+                LocalTime.of(9, 0), LocalTime.of(21, 0),
+                128000, LocalTime.of(11, 0),
+                LocalTime.of(3, 0), LocalTime.of(18, 0), LocalTime.of(21, 0), 18000,
+                LocalTime.of(0, 0), LocalTime.of(0, 0), LocalTime.of(0, 0), 0
+            ),
+            Arguments.of(
+                "야간 근무가 포함된 근무",
+                LocalTime.of(23, 0), LocalTime.of(4, 0),
+                95000, LocalTime.of(5, 0),
+                LocalTime.of(0, 0), LocalTime.of(0, 0), LocalTime.of(0, 0), 0,
+                LocalTime.of(5, 0), LocalTime.of(23, 0), LocalTime.of(4, 0), 45000
+            ),
+            Arguments.of(
+                "연장/야간 근무가 포함된 근무",
+                LocalTime.of(9, 0), LocalTime.of(1, 0),
+                219000, LocalTime.of(15, 0),
+                LocalTime.of(7, 0), LocalTime.of(18, 0), LocalTime.of(1, 0), 42000,
+                LocalTime.of(3, 0), LocalTime.of(22, 0), LocalTime.of(1, 0), 27000
             )
         );
     }

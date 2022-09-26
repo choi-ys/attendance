@@ -15,23 +15,23 @@ public class Overtime {
     public static final int ONE_HOUR_BY_MINUTE = 60;
     private LocalTime startTime;
     private LocalTime endTime;
-    private LocalTime duration;
+    private LocalTime workingTime;
     private int extraPay;
 
-    private Overtime(LocalTime startTime, LocalTime endTime, LocalTime duration, int extraPay) {
+    private Overtime(LocalTime startTime, LocalTime endTime, LocalTime workingTime, int extraPay) {
         this.startTime = startTime;
         this.endTime = endTime;
-        this.duration = duration;
+        this.workingTime = workingTime;
         this.extraPay = extraPay;
     }
 
     public static Overtime of(LocalDateTime startAt, LocalDateTime endAt) {
-        Duration between = Duration.between(startAt, endAt);
-        if (isNotOvertime(between)) {
+        Duration duration = Duration.between(startAt, endAt);
+        if (isNotOvertime(duration)) {
             return notExistOvertime();
         }
-        LocalTime duration = calculateDuration(between);
-        return new Overtime(getOvertimeStartTime(startAt), endAt.toLocalTime(), duration, calculateExtraPay(duration));
+        LocalTime workingTime = calculateWorkingTime(duration);
+        return new Overtime(getOvertimeStartTime(startAt), endAt.toLocalTime(), workingTime, calculateExtraPay(workingTime));
     }
 
     private static int calculateExtraPay(LocalTime duration) {
@@ -39,8 +39,8 @@ public class Overtime {
         return totalOvertimeMinute * EXTRA_PAY_PER_MINUTE;
     }
 
-    private static LocalTime calculateDuration(Duration between) {
-        return LocalTime.of(between.toHoursPart() - DAILY_STATUTORY_WORKING_HOUR, between.toMinutesPart());
+    private static LocalTime calculateWorkingTime(Duration duration) {
+        return LocalTime.of(duration.toHoursPart() - DAILY_STATUTORY_WORKING_HOUR, duration.toMinutesPart());
     }
 
     public static Overtime notExistOvertime() {
@@ -48,12 +48,12 @@ public class Overtime {
         return new Overtime(zero, zero, zero, ZERO);
     }
 
-    private static boolean isOvertime(Duration between) {
-        return between.toMinutes() - DAILY_STATUTORY_WORKING_MINUTE > ZERO;
+    private static boolean isOvertime(Duration duration) {
+        return duration.toMinutes() - DAILY_STATUTORY_WORKING_MINUTE > ZERO;
     }
 
-    private static boolean isNotOvertime(Duration between) {
-        return !isOvertime(between);
+    private static boolean isNotOvertime(Duration duration) {
+        return !isOvertime(duration);
     }
 
     private static LocalTime getOvertimeStartTime(LocalDateTime startAt) {

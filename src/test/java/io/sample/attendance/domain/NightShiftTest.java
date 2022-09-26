@@ -35,7 +35,7 @@ class NightShiftTest {
         assertAll(
             () -> assertThat(given.getStartTime()).isEqualTo(expectedNightShiftStartTime),
             () -> assertThat(given.getEndTime()).isEqualTo(expectedNightShiftEndTime),
-            () -> assertThat(given.getDuration()).isEqualTo(expectedOvertimeDuration),
+            () -> assertThat(given.getWorkingTime()).isEqualTo(expectedOvertimeDuration),
             () -> assertThat(given.getExtraPay()).isEqualTo(expectedExtraPay)
         );
     }

@@ -19,13 +19,13 @@ public class NightShift {
 
     private LocalTime startTime;
     private LocalTime endTime;
-    private LocalTime duration;
+    private LocalTime workingTime;
     private int extraPay;
 
-    private NightShift(LocalTime startTime, LocalTime endTime, LocalTime duration, int extraPay) {
+    private NightShift(LocalTime startTime, LocalTime endTime, LocalTime workingTime, int extraPay) {
         this.startTime = startTime;
         this.endTime = endTime;
-        this.duration = duration;
+        this.workingTime = workingTime;
         this.extraPay = extraPay;
     }
 
@@ -35,16 +35,16 @@ public class NightShift {
         }
         LocalDateTime overtimeStartAt = getNightShiftStartTime(startAt);
         LocalDateTime overtimeEndAt = getNightShiftEndTime(endAt);
-        Duration between = Duration.between(overtimeStartAt, overtimeEndAt);
-        return new NightShift(overtimeStartAt.toLocalTime(), overtimeEndAt.toLocalTime(), calculateDuration(between), calculateExtraPay(between));
+        Duration duration = Duration.between(overtimeStartAt, overtimeEndAt);
+        return new NightShift(overtimeStartAt.toLocalTime(), overtimeEndAt.toLocalTime(), calculateWorkingTime(duration), calculateExtraPay(duration));
     }
 
-    private static int calculateExtraPay(Duration between) {
-        return (int) (between.toMinutes() * EXTRA_PAY_PER_MINUTE);
+    private static int calculateExtraPay(Duration duration) {
+        return (int) (duration.toMinutes() * EXTRA_PAY_PER_MINUTE);
     }
 
-    private static LocalTime calculateDuration(Duration between) {
-        return LocalTime.of(between.toHoursPart(), between.toMinutesPart());
+    private static LocalTime calculateWorkingTime(Duration duration) {
+        return LocalTime.of(duration.toHoursPart(), duration.toMinutesPart());
     }
 
     private static LocalDateTime getNightShiftStartTime(LocalDateTime startAt) {
