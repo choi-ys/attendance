@@ -11,14 +11,18 @@ import lombok.Getter;
 
 @Getter
 public class Overtime {
+    public static final int EXTRA_PAY_PER_MINUTE = 100;
+    public static final int ONE_HOUR_BY_MINUTE = 60;
     private LocalTime startTime;
     private LocalTime endTime;
     private LocalTime duration;
+    private int extraPay;
 
-    private Overtime(LocalTime startTime, LocalTime endTime, LocalTime duration) {
+    private Overtime(LocalTime startTime, LocalTime endTime, LocalTime duration, int extraPay) {
         this.startTime = startTime;
         this.endTime = endTime;
         this.duration = duration;
+        this.extraPay = extraPay;
     }
 
     public static Overtime of(LocalDateTime startAt, LocalDateTime endAt) {
@@ -27,8 +31,12 @@ public class Overtime {
             return notExistOvertime();
         }
         LocalTime duration = getDuration(between);
-        LocalTime overtimeStartTime = getOvertimeStartTime(startAt);
-        return new Overtime(overtimeStartTime, endAt.toLocalTime(), duration);
+        return new Overtime(getOvertimeStartTime(startAt), endAt.toLocalTime(), duration, calculateExtraPay(duration));
+    }
+
+    private static int calculateExtraPay(LocalTime duration) {
+        int totalOvertimeMinute = (duration.getHour() * ONE_HOUR_BY_MINUTE) + duration.getMinute();
+        return totalOvertimeMinute * EXTRA_PAY_PER_MINUTE;
     }
 
     private static LocalTime getDuration(Duration between) {
@@ -36,8 +44,8 @@ public class Overtime {
     }
 
     public static Overtime notExistOvertime() {
-        LocalTime zero = LocalTime.MIDNIGHT;
-        return new Overtime(zero, zero, zero);
+        final LocalTime zero = LocalTime.MIDNIGHT;
+        return new Overtime(zero, zero, zero, ZERO);
     }
 
     private static boolean isOvertime(Duration between) {
