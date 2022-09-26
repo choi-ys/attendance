@@ -16,9 +16,9 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 @DisplayName("Domain:Attendance")
 class AttendanceTest {
-    @ParameterizedTest(name = "[Case#{index}] {0} : 근무시간 = {1} ~ {2}, 퇴근일 = {3}")
+    @ParameterizedTest(name = "[Case#{index}] {0} : 출/퇴근 시간 : {1} ~ {2}, 퇴근일 : {3}")
     @MethodSource
-    @DisplayName("근무 시작/종료 시간을 이용한 근태 객체 생성")
+    @DisplayName("출/퇴근 시간을 이용한 근태 객체 생성")
     public void createAttendance(
         final String testCaseDescription,
         final LocalTime startTime,
@@ -52,5 +52,38 @@ class AttendanceTest {
         // When & Then
         assertThatExceptionOfType(IllegalArgumentException.class)
             .isThrownBy(() -> Attendance.of(localTime, localTime));
+    }
+
+    @ParameterizedTest(name = "[Case#{index}] {0} : 출/퇴근 시간 : {1} ~ {2}, 실 근무 시간 : {3}")
+    @MethodSource
+    @DisplayName("출/퇴근 시간으로부터 총 근무 시간 산출")
+    public void getTotalWorkingTime(
+        final String testCaseDescription,
+        final LocalTime startTime,
+        final LocalTime endTime,
+        final LocalTime expectedWorkingTime
+    ) {
+        // given
+        Attendance given = Attendance.of(startTime, endTime);
+
+        // When & Then
+        assertThat(given.getWorkingTime()).isEqualTo(expectedWorkingTime);
+    }
+
+    private static Stream<Arguments> getTotalWorkingTime() {
+        return Stream.of(
+            Arguments.of(
+                "근로 시간이 9시간 미만인 경우",
+                LocalTime.of(9, 0),
+                LocalTime.of(17, 0),
+                LocalTime.of(8, 0)
+            ),
+            Arguments.of(
+                "근로 시간이 9시간 이상인 경우",
+                LocalTime.of(9, 0),
+                LocalTime.of(18, 0),
+                LocalTime.of(8, 0)
+            )
+        );
     }
 }
