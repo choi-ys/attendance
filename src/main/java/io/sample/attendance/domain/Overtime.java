@@ -30,7 +30,7 @@ public class Overtime {
         if (isNotOvertime(between)) {
             return notExistOvertime();
         }
-        LocalTime duration = getDuration(between);
+        LocalTime duration = calculateDuration(between);
         return new Overtime(getOvertimeStartTime(startAt), endAt.toLocalTime(), duration, calculateExtraPay(duration));
     }
 
@@ -39,7 +39,7 @@ public class Overtime {
         return totalOvertimeMinute * EXTRA_PAY_PER_MINUTE;
     }
 
-    private static LocalTime getDuration(Duration between) {
+    private static LocalTime calculateDuration(Duration between) {
         return LocalTime.of(between.toHoursPart() - DAILY_STATUTORY_WORKING_HOUR, between.toMinutesPart());
     }
 

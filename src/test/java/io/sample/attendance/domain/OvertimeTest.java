@@ -14,17 +14,17 @@ import org.junit.jupiter.params.provider.MethodSource;
 class OvertimeTest {
     @ParameterizedTest(name = "[Case#{index}] {0} : 출/퇴근: {1} ~ {2}, 연장 근무 : {3} ~ {4}, 총 연장 근무 : {5}, 연장 근무 수당 : {6}")
     @MethodSource
-    @DisplayName("일일 출근 기록으로 부터 연장 근무 시간을 추출한다.")
+    @DisplayName("일일 출근 기록으로 부터 연장 근무 시간을 추출")
     public void getOvertime(
         final String testDescription,
         final LocalTime startTime,
         final LocalTime endTime,
         final LocalTime expectedOvertimeStartTime,
         final LocalTime expectedOvertimeEndTime,
-        final LocalTime expectedOvertimePeriod,
+        final LocalTime expectedOvertimeDuration,
         final int expectedExtraPay
     ) {
-        // Given1
+        // Given
         Attendance attendance = Attendance.of(startTime, endTime);
 
         // When
@@ -34,7 +34,7 @@ class OvertimeTest {
         assertAll(
             () -> assertThat(given.getStartTime()).isEqualTo(expectedOvertimeStartTime),
             () -> assertThat(given.getEndTime()).isEqualTo(expectedOvertimeEndTime),
-            () -> assertThat(given.getDuration()).isEqualTo(expectedOvertimePeriod),
+            () -> assertThat(given.getDuration()).isEqualTo(expectedOvertimeDuration),
             () -> assertThat(given.getExtraPay()).isEqualTo(expectedExtraPay)
         );
     }
