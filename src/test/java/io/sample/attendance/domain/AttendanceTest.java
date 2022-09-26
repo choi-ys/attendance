@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
+import io.sample.attendance.ui.DailyPayStubView;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -92,6 +93,7 @@ class AttendanceTest {
             () -> assertThat(given.getNightShiftEndAt()).as("야간 근로 종료 시간").isEqualTo(expectedNightShiftEndAt),
             () -> assertThat(given.getNightShiftExtraPay()).as("야간 근로 수당").isEqualTo(expectedNightShiftExtraPay)
         );
+        DailyPayStubView.printDailyPayStub(given);
     }
 
     private static Stream<Arguments> dailyPayStub() {
