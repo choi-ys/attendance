@@ -25,9 +25,9 @@ class TimeTableTest {
 
         // Then
         assertAll(
-            () -> assertThat(given.getDurationOfTime())
+            () -> assertThat(given.getDuration())
                 .as("시작/종료 사이 소요 시간을 hh:mm 형식으로 반환")
-                .isEqualTo(LocalTime.of(7, 36)),
+                .isEqualTo(WorkDuration.of(7, 36)),
             () -> assertThat(given.getDurationByMinute())
                 .as("시작/종료 사이 소요 시간을 분으로 환산")
                 .isEqualTo(456)

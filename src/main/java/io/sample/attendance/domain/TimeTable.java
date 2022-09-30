@@ -2,12 +2,12 @@ package io.sample.attendance.domain;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import lombok.Getter;
 
 @Getter
 public class TimeTable {
     public static final int MINUTE_PER_HOUR = 60;
+    public static final int HOUR_PER_DAY = 24;
     private LocalDateTime startAt;
     private LocalDateTime endAt;
 
@@ -20,9 +20,9 @@ public class TimeTable {
         return new TimeTable(startAt, endAt);
     }
 
-    public LocalTime getDurationOfTime() {
+    public WorkDuration getDuration() {
         Duration between = between();
-        return LocalTime.of(between.toHoursPart(), between.toMinutesPart());
+        return WorkDuration.of((int) between.toHours(), between.toMinutesPart());
     }
 
     private Duration between() {
@@ -30,11 +30,6 @@ public class TimeTable {
     }
 
     public int getDurationByMinute() {
-        LocalTime durationOfTime = getDurationOfTime();
-        return hoursToMinutes(durationOfTime.getHour()) + durationOfTime.getMinute();
-    }
-
-    private int hoursToMinutes(int hour) {
-        return hour * MINUTE_PER_HOUR;
+        return (int) between().toMinutes();
     }
 }
