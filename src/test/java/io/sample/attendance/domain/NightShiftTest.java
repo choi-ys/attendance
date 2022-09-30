@@ -14,9 +14,9 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 @DisplayName("Domain:NightShift")
 class NightShiftTest {
-    @ParameterizedTest(name = "[Case#{index}] : 출/퇴근: {0} ~ {1}, 연장 근무 : {2} ~ {3}, 총 야간 근무 : {4}, 연장 야간 수당 : {5}")
+    @ParameterizedTest(name = "[Case#{index}] : 출/퇴근: {0} ~ {1}, 야간 근무 : {2} ~ {3}, 총 야간 근무 : {4}, 야간 근무 수당 : {5}")
     @MethodSource
-    @DisplayName("일일 출근 기록으로 부터 야간 근무 시간을 추출")
+    @DisplayName("일일 출근 기록으로 부터 야간 근무 정보 산출")
     public void getNightShift(
         final LocalTime startTime,
         final LocalTime endTime,

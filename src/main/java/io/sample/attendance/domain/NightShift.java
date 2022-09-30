@@ -75,8 +75,16 @@ public class NightShift {
     }
 
     private static boolean isNightShift(LocalDateTime startAt, LocalDateTime endAt) {
-        return isStartAtDayBeforeEndAtDay(startAt, endAt) ||
-            isContainNightShiftRange(startAt, endAt);
+        return isNotSameWorkDay(startAt, endAt)
+            || isContainNightShiftRange(startAt, endAt);
+    }
+
+    private static boolean isNotSameWorkDay(LocalDateTime startAt, LocalDateTime endAt) {
+        return !isSameWorkDay(startAt, endAt);
+    }
+
+    private static boolean isSameWorkDay(LocalDateTime startAt, LocalDateTime endAt) {
+        return startAt.getDayOfMonth() == endAt.getDayOfMonth();
     }
 
     private static boolean isContainNightShiftRange(LocalDateTime startAt, LocalDateTime endAt) {
@@ -85,9 +93,5 @@ public class NightShift {
 
     private static boolean isBetween(LocalTime targetTime) {
         return targetTime.isAfter(NIGHT_SHIFT_START_TIME) || targetTime.isBefore(NIGHT_SHIFT_END_TIME);
-    }
-
-    private static boolean isStartAtDayBeforeEndAtDay(LocalDateTime startAt, LocalDateTime endAt) {
-        return startAt.getDayOfMonth() == endAt.getDayOfMonth() - 1;
     }
 }
