@@ -15,8 +15,7 @@ public class Attendance {
     public static final int DAILY_STATUTORY_WORKING_MINUTE = 540;
     public static final int BASIC_PAY_PER_HOUR = 10000;
 
-    private LocalDateTime startAt;
-    private LocalDateTime endAt;
+    private TimeTable timeTable;
     private LocalTime workingTime;
     private Overtime overtime;
     private NightShift nightShift;
@@ -24,8 +23,7 @@ public class Attendance {
     private int totalPay;
 
     private Attendance(LocalDateTime startAt, LocalDateTime endAt) {
-        this.startAt = startAt;
-        this.endAt = endAt;
+        this.timeTable = TimeTable.of(startAt, endAt);
         this.workingTime = calculateWorkingTime();
         this.overtime = Overtime.of(startAt, endAt);
         this.nightShift = NightShift.of(startAt, endAt);
@@ -66,7 +64,7 @@ public class Attendance {
     }
 
     private LocalTime calculateWorkingTime() {
-        Duration duration = Duration.between(startAt, endAt);
+        Duration duration = Duration.between(timeTable.getStartAt(), timeTable.getEndAt());
         if (hasBreakTime(duration)) {
             duration = duration.minusHours(MAX_BREAK_TIME_HOUR);
         }
@@ -75,6 +73,14 @@ public class Attendance {
 
     private boolean hasBreakTime(Duration duration) {
         return duration.toHours() >= DAILY_STATUTORY_WORKING_HOUR;
+    }
+
+    public LocalDateTime getStartAt() {
+        return timeTable.getStartAt();
+    }
+
+    public LocalDateTime getEndAt() {
+        return timeTable.getEndAt();
     }
 
     public LocalTime getOvertimeWorkingTime() {

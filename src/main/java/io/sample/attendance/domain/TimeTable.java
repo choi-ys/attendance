@@ -3,7 +3,9 @@ package io.sample.attendance.domain;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import lombok.Getter;
 
+@Getter
 public class TimeTable {
     public static final int MINUTE_PER_HOUR = 60;
     private LocalDateTime startAt;
