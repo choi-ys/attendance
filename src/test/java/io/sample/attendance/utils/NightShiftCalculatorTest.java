@@ -1,4 +1,4 @@
-package io.sample.attendance.service;
+package io.sample.attendance.utils;
 
 import static io.sample.attendance.fixture.TestCaseArgumentsGenerator.add;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -6,7 +6,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import io.sample.attendance.domain.ExtraWork;
 import io.sample.attendance.domain.ExtraWorkType;
 import io.sample.attendance.fixture.TestCaseArgumentsGenerator;
-import io.sample.attendance.utils.NightShiftCalculator;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -19,7 +18,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-@DisplayName("DomainService:NightShiftCalculator")
+@DisplayName("Utils:NightShiftCalculator")
 class NightShiftCalculatorTest {
     @ParameterizedTest(name = "[Case#{index}]{0} : {1} ~ {2}")
     @MethodSource(value = "isNightShift")
