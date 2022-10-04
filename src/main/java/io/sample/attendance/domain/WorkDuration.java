@@ -3,7 +3,9 @@ package io.sample.attendance.domain;
 import static org.hibernate.type.IntegerType.ZERO;
 
 import java.util.Objects;
+import lombok.Getter;
 
+@Getter
 public class WorkDuration {
     public static final int MAXIMUM_HOURS = 28;
     public static final String OVER_MAXIMUM_WORKING_HOURS_ERROR_MESSAGE = "근무 소요 시간은 28시간을 초과할 수 없습니다.";

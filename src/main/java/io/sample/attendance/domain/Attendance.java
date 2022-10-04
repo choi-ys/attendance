@@ -1,117 +1,70 @@
 package io.sample.attendance.domain;
 
 import java.time.Duration;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import lombok.Getter;
 
 @Getter
 public class Attendance {
-    public static final String START_TIME_AND_END_TIME_IS_SAME_ERROR_MESSAGE = "출근시간과 퇴근시간은 같을 수 없습니다.";
+    public static final String START_AT_AND_END_AT_IS_SAME_ERROR_MESSAGE = "출근시간과 퇴근시간은 같을 수 없습니다.";
+    public static final String END_AT_IS_EARLIER_THAN_START_AT_ERROR_MESSAGE = "퇴근시간이 출근시간 보다 빠를 수 없습니다.";
     public static final int DAILY_STATUTORY_ACTUAL_WORKING_HOUR = 8;
     public static final int MAX_BREAK_TIME_HOUR = 1;
     public static final int DAILY_STATUTORY_WORKING_HOUR = DAILY_STATUTORY_ACTUAL_WORKING_HOUR + MAX_BREAK_TIME_HOUR;
     public static final int DAILY_STATUTORY_WORKING_MINUTE = 540;
     public static final int BASIC_PAY_PER_HOUR = 10000;
 
-    private TimeTable timeTable;
-    private LocalTime workingTime;
-    private Overtime overtime;
-    private NightShift nightShift;
+    private LocalDateTime startAt;
+    private LocalDateTime endAt;
+    private WorkDuration workDuration;
+    private ExtraWorks extraWorks;
     private int basicPay;
     private int totalPay;
 
     private Attendance(LocalDateTime startAt, LocalDateTime endAt) {
-        this.timeTable = TimeTable.of(startAt, endAt);
-        this.workingTime = calculateWorkingTime();
-        this.overtime = Overtime.of(startAt, endAt);
-        this.nightShift = NightShift.of(startAt, endAt);
+        this.startAt = startAt;
+        this.endAt = endAt;
+        this.workDuration = calculateWorkingTime();
+        this.extraWorks = new ExtraWorks(startAt, endAt);
         this.basicPay = calculateBasicPay();
         this.totalPay = calculateTotalPay();
     }
 
+    public static Attendance of(LocalDateTime startAt, LocalDateTime endAt) {
+        validateCommuteTime(startAt, endAt);
+        return new Attendance(startAt, endAt);
+    }
+
     private int calculateBasicPay() {
-        return workingTime.getHour() * BASIC_PAY_PER_HOUR;
+        return workDuration.getHour() * BASIC_PAY_PER_HOUR;
     }
 
     private int calculateTotalPay() {
-        return basicPay + overtime.getExtraPay() + nightShift.getExtraPay();
+        return basicPay + extraWorks.getTotalExtraPay();
     }
 
-    public static Attendance of(LocalTime startTime, LocalTime endTime) {
-        validateCommuteTime(startTime, endTime);
-        LocalDate today = LocalDate.now();
-        LocalDate endDate = calculateEndDate(startTime, endTime);
-        return new Attendance(LocalDateTime.of(today, startTime), LocalDateTime.of(endDate, endTime));
+    private WorkDuration calculateWorkingTime() {
+        Duration between = Duration.between(startAt, endAt);
+        int totalMinute = (int) between.toMinutes();
+        int hour = totalMinute / 60;
+        int minute = totalMinute % 60;
+        return WorkDuration.of(hour, minute);
     }
 
-    private static void validateCommuteTime(LocalTime startTime, LocalTime endTime) {
-        if (startTime.equals(endTime)) {
-            throw new IllegalArgumentException(START_TIME_AND_END_TIME_IS_SAME_ERROR_MESSAGE);
+    private static void validateCommuteTime(LocalDateTime startAt, LocalDateTime endAt) {
+        validateCommuteTimeIsSame(startAt, endAt);
+        validateEndAtIsEarlierThanStartAt(startAt, endAt);
+    }
+
+    private static void validateCommuteTimeIsSame(LocalDateTime startAt, LocalDateTime endAt) {
+        if (startAt.equals(endAt)) {
+            throw new IllegalArgumentException(START_AT_AND_END_AT_IS_SAME_ERROR_MESSAGE);
         }
     }
 
-    private static LocalDate calculateEndDate(LocalTime startTime, LocalTime endTime) {
-        if (isNextDayEnd(startTime, endTime)) {
-            return LocalDate.now().plusDays(1);
+    private static void validateEndAtIsEarlierThanStartAt(LocalDateTime startAt, LocalDateTime endAt) {
+        if (endAt.isBefore(startAt)) {
+            throw new IllegalArgumentException(END_AT_IS_EARLIER_THAN_START_AT_ERROR_MESSAGE);
         }
-        return LocalDate.now();
-    }
-
-    private static boolean isNextDayEnd(LocalTime startTime, LocalTime endTime) {
-        return startTime.isAfter(endTime);
-    }
-
-    private LocalTime calculateWorkingTime() {
-        Duration duration = Duration.between(timeTable.getStartAt(), timeTable.getEndAt());
-        if (hasBreakTime(duration)) {
-            duration = duration.minusHours(MAX_BREAK_TIME_HOUR);
-        }
-        return LocalTime.of(duration.toHoursPart(), duration.toMinutesPart());
-    }
-
-    private boolean hasBreakTime(Duration duration) {
-        return duration.toHours() >= DAILY_STATUTORY_WORKING_HOUR;
-    }
-
-    public LocalDateTime getStartAt() {
-        return timeTable.getStartAt();
-    }
-
-    public LocalDateTime getEndAt() {
-        return timeTable.getEndAt();
-    }
-
-    public LocalTime getOvertimeWorkingTime() {
-        return overtime.getWorkingTime();
-    }
-
-    public LocalTime getOvertimeStartAt() {
-        return overtime.getStartTime();
-    }
-
-    public LocalTime getOvertimeEndAt() {
-        return overtime.getEndTime();
-    }
-
-    public int getOvertimeExtraPay() {
-        return overtime.getExtraPay();
-    }
-
-    public LocalTime getNightShiftWorkingTime() {
-        return nightShift.getWorkingTime();
-    }
-
-    public LocalTime getNightShiftStartAt() {
-        return nightShift.getStartTime();
-    }
-
-    public LocalTime getNightShiftEndAt() {
-        return nightShift.getEndTime();
-    }
-
-    public int getNightShiftExtraPay() {
-        return nightShift.getExtraPay();
     }
 }
