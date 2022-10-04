@@ -2,6 +2,7 @@ package io.sample.attendance.domain;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.Objects;
 import lombok.Getter;
 
 @Getter
@@ -31,5 +32,23 @@ public class TimeTable {
 
     public int getDurationByMinute() {
         return (int) between().toMinutes();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        TimeTable timeTable = (TimeTable) o;
+        return Objects.equals(startAt, timeTable.startAt) &&
+            Objects.equals(endAt, timeTable.endAt);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(startAt, endAt);
     }
 }

@@ -1,6 +1,7 @@
 package io.sample.attendance.domain;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 import lombok.Getter;
 
 @Getter
@@ -30,5 +31,24 @@ public class ExtraWork {
 
     public WorkDuration getDuration() {
         return timeTable.getDuration();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ExtraWork extraWork = (ExtraWork) o;
+        return pay == extraWork.pay &&
+            Objects.equals(timeTable, extraWork.timeTable) &&
+            extraWorkType == extraWork.extraWorkType;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(timeTable, extraWorkType, pay);
     }
 }
