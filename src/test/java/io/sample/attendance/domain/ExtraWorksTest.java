@@ -13,35 +13,76 @@ import org.junit.jupiter.api.Test;
 class ExtraWorksTest {
     final LocalDate today = LocalDate.now();
     final LocalDate nextDay = today.plusDays(1);
-    final LocalTime startTime = LocalTime.of(22, 0);
-    final LocalTime endTime = LocalTime.of(6, 0);
-    final LocalDateTime startAt = LocalDateTime.of(today, startTime);
-    final LocalDateTime endAt = LocalDateTime.of(nextDay, endTime);
-
-    ExtraWork nightShift = ExtraWork.of(startAt, endAt, ExtraWorkType.NIGHT_SHIFT);
-    ExtraWork overtime = ExtraWork.of(startAt, endAt, ExtraWorkType.OVERTIME);
 
     @Test
-    @DisplayName("추가 근무 목록 객체 생성")
+    @DisplayName("야간/연장 근무가 없는 추가 근무 목록 객체 생성")
     public void create() {
         // Given
-        ExtraWorks extraWorks = new ExtraWorks();
+        final LocalDateTime startAt = LocalDateTime.of(today, LocalTime.of(9, 0));
+        final LocalDateTime endAt = LocalDateTime.of(today, LocalTime.of(18, 0));
 
         // When
-        extraWorks.add(nightShift);
-        extraWorks.add(overtime);
+        ExtraWorks given = new ExtraWorks(startAt, endAt);
 
         // Then
         assertAll(
-            () -> assertThat(extraWorks.getSize())
-                .as("추가 근무 건수")
-                .isEqualTo(2),
-            () -> assertThat(extraWorks.getTotalExtraPay())
-                .as("추가 수당의 합")
-                .isEqualTo(120000),
-            () -> assertThat(extraWorks.getExtraWorkTypes())
-                .as("추가 근무 타입 목록")
-                .contains(ExtraWorkType.NIGHT_SHIFT, ExtraWorkType.OVERTIME)
+            () -> assertThat(given.getSize()).isZero(),
+            () -> assertThat(given.getExtraWorkTypes()).isEmpty(),
+            () -> assertThat(given.getTotalExtraPay()).isZero()
+        );
+    }
+
+    @Test
+    @DisplayName("연장 근무가 포함된 추가 근무 목록 객체 생성")
+    public void createExtraWorksIncludedOvertime() {
+        // Given
+        final LocalDateTime startAt = LocalDateTime.of(today, LocalTime.of(9, 0));
+        final LocalDateTime endAt = LocalDateTime.of(today, LocalTime.of(20, 1));
+
+        // When
+        ExtraWorks given = new ExtraWorks(startAt, endAt);
+
+        // Then
+        assertAll(
+            () -> assertThat(given.getSize()).isEqualTo(1),
+            () -> assertThat(given.getExtraWorkTypes()).containsExactly(ExtraWorkType.OVERTIME),
+            () -> assertThat(given.getTotalExtraPay()).isEqualTo(12100)
+        );
+    }
+
+    @Test
+    @DisplayName("야간 근무가 포함된 추가 근무 목록 객체 생성")
+    public void createExtraWorksIncludedNightShift() {
+        // Given
+        final LocalDateTime startAt = LocalDateTime.of(today, LocalTime.of(22, 0));
+        final LocalDateTime endAt = LocalDateTime.of(nextDay, LocalTime.of(6, 0));
+
+        // When
+        ExtraWorks given = new ExtraWorks(startAt, endAt);
+
+        // Then
+        assertAll(
+            () -> assertThat(given.getSize()).isEqualTo(1),
+            () -> assertThat(given.getExtraWorkTypes()).containsExactly(ExtraWorkType.NIGHT_SHIFT),
+            () -> assertThat(given.getTotalExtraPay()).isEqualTo(72000)
+        );
+    }
+
+    @Test
+    @DisplayName("연장근무와 야간근무가 모두 포함된 추가 근무 목록 객체 생성")
+    public void createExtraWorksIncludedOvertimeAndNightShift() {
+        // Given
+        final LocalDateTime startAt = LocalDateTime.of(today, LocalTime.of(5, 20));
+        final LocalDateTime endAt = LocalDateTime.of(nextDay, LocalTime.of(6, 0));
+
+        // When
+        ExtraWorks given = new ExtraWorks(startAt, endAt);
+
+        // Then
+        assertAll(
+            () -> assertThat(given.getSize()).isEqualTo(3),
+            () -> assertThat(given.getExtraWorkTypes()).containsAnyOf(ExtraWorkType.NIGHT_SHIFT, ExtraWorkType.OVERTIME),
+            () -> assertThat(given.getTotalExtraPay()).isEqualTo(172000)
         );
     }
 }
