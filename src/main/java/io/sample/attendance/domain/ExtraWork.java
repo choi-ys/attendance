@@ -63,6 +63,14 @@ public class ExtraWork {
         return timeTable.getWorkDuration();
     }
 
+    public LocalDateTime getStartAt() {
+        return timeTable.getStartAt();
+    }
+
+    public LocalDateTime getEndAt() {
+        return timeTable.getEndAt();
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
