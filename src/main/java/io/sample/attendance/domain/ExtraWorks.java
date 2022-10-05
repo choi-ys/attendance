@@ -47,7 +47,7 @@ public class ExtraWorks {
     public WorkDuration getOvertimeDuration() {
         ExtraWork overTime = getOverTime();
         if (overTime != null) {
-            return overTime.getDuration();
+            return overTime.getWorkDuration();
         }
         return WorkDuration.empty();
     }
@@ -67,7 +67,7 @@ public class ExtraWorks {
     public WorkDuration getNightShiftDuration() {
         return elements.stream()
             .filter(ExtraWork::isNightShift)
-            .map(ExtraWork::getDuration)
+            .map(ExtraWork::getWorkDuration)
             .reduce((x, y) -> WorkDuration.of(x.getHour() + y.getHour(), x.getMinute() + y.getMinute()))
             .orElseGet(WorkDuration::empty);
     }

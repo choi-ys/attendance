@@ -17,6 +17,10 @@ public class WorkDuration {
         this.minute = minute;
     }
 
+    public static WorkDuration empty() {
+        return new WorkDuration(ZERO, ZERO);
+    }
+
     public static WorkDuration of(int hour, int minute) {
         validateWorkingTime(hour, minute);
         return new WorkDuration(hour, minute);
@@ -30,10 +34,6 @@ public class WorkDuration {
 
     private static boolean isOverThanMaximumWorkingDuration(int hour, int minute) {
         return hour >= MAXIMUM_HOURS && minute > ZERO;
-    }
-
-    public static WorkDuration empty() {
-        return new WorkDuration(ZERO, ZERO);
     }
 
     @Override

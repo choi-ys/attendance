@@ -21,7 +21,7 @@ public class Attendance {
 
     private Attendance(LocalDateTime startAt, LocalDateTime endAt) {
         this.timeTable = TimeTable.of(startAt, endAt);
-        this.workDuration = timeTable.getDuration();
+        this.workDuration = timeTable.getWorkDuration();
         this.extraWorks = new ExtraWorks(startAt, endAt);
         this.basicPay = calculateBasicPay();
         this.totalPay = calculateTotalPay();

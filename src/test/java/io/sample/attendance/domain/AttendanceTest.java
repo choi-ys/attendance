@@ -102,7 +102,7 @@ class AttendanceTest {
                 assertThat(overTime.getPay()).as("연장 근무 수당").isEqualTo(24000);
                 assertThat(timeTable.getStartAt()).as("연장 근무 시작 시간").isEqualTo(LocalDateTime.of(today, LocalTime.of(18, 0)));
                 assertThat(timeTable.getEndAt()).as("연장 근무 종료 시간").isEqualTo(LocalDateTime.of(today, LocalTime.of(22, 0)));
-                assertThat(timeTable.getDuration()).as("연장 근무 시간").isEqualTo(WorkDuration.of(4, 0));
+                assertThat(timeTable.getWorkDuration()).as("연장 근무 시간").isEqualTo(WorkDuration.of(4, 0));
             }
         );
     }
@@ -138,7 +138,7 @@ class AttendanceTest {
                 TimeTable timeTable = nightShift.getTimeTable();
                 assertThat(nightShifts).hasSize(1);
                 assertThat(nightShift.getPay()).as("첫번째 야간 근무 종료 수당").isEqualTo(65250);
-                assertThat(nightShift.getDuration()).as("첫번째 야간 근로 시간").isEqualTo(WorkDuration.of(7, 15));
+                assertThat(nightShift.getWorkDuration()).as("첫번째 야간 근로 시간").isEqualTo(WorkDuration.of(7, 15));
                 assertThat(timeTable.getStartAt()).as("첫번째 야간 근무 구간 시작 시간").isEqualTo(LocalDateTime.of(today, LocalTime.of(22, 0)));
                 assertThat(timeTable.getEndAt()).as("첫번째 야간 근무 종료 시간").isEqualTo(LocalDateTime.of(nextDay, LocalTime.of(5, 15)));
             }
@@ -177,7 +177,7 @@ class AttendanceTest {
                 assertThat(overTime).as("연장 근무 정보").isNotNull();
                 assertThat(overTime.getTimeTable().getStartAt()).as("연장 근무 시작 시간").isEqualTo(LocalDateTime.of(today, LocalTime.of(14, 30)));
                 assertThat(overTime.getTimeTable().getEndAt()).as("연장 근무 종료 시간").isEqualTo(LocalDateTime.of(nextDay, LocalTime.of(9, 15)));
-                assertThat(overTime.getDuration()).as("연장 근무 시간").isEqualTo(WorkDuration.of(18, 45));
+                assertThat(overTime.getWorkDuration()).as("연장 근무 시간").isEqualTo(WorkDuration.of(18, 45));
                 assertThat(overTime.getPay()).as("연장 근무 수당").isEqualTo(112500);
             },
             () -> {

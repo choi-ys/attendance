@@ -13,7 +13,7 @@ public class ExtraWork {
     private ExtraWork(LocalDateTime startAt, LocalDateTime endAt, ExtraWorkType extraWorkType) {
         this.timeTable = TimeTable.of(startAt, endAt);
         this.extraWorkType = extraWorkType;
-        int totalMinute = timeTable.getDurationByMinute();
+        int totalMinute = timeTable.getWorkDurationByMinute();
         this.pay = extraWorkType.calculateExtraPay(totalMinute);
     }
 
@@ -29,8 +29,8 @@ public class ExtraWork {
         return extraWorkType.isOvertime();
     }
 
-    public WorkDuration getDuration() {
-        return timeTable.getDuration();
+    public WorkDuration getWorkDuration() {
+        return timeTable.getWorkDuration();
     }
 
     @Override

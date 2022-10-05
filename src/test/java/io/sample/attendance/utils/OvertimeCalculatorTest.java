@@ -59,6 +59,6 @@ class OvertimeCalculatorTest {
         assertThat(given.getPay()).isEqualTo(100);
         assertThat(given.isOvertime()).isTrue();
         assertThat(given.getTimeTable()).isEqualTo(TimeTable.of(endAt.minusMinutes(1), endAt));
-        assertThat(given.getDuration()).isEqualTo(WorkDuration.of(0, 1));
+        assertThat(given.getWorkDuration()).isEqualTo(WorkDuration.of(0, 1));
     }
 }

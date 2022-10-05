@@ -10,13 +10,15 @@ import lombok.Getter;
 @Getter
 public class TimeTable {
     public static final int MINUTE_PER_HOUR = 60;
-    public static final int HOUR_PER_DAY = 24;
+
     private LocalDateTime startAt;
     private LocalDateTime endAt;
+    private WorkDuration workDuration;
 
     private TimeTable(LocalDateTime startAt, LocalDateTime endAt) {
         this.startAt = startAt;
         this.endAt = endAt;
+        this.workDuration = calculateDuration();
     }
 
     public static TimeTable of(LocalDateTime startAt, LocalDateTime endAt) {
@@ -24,10 +26,10 @@ public class TimeTable {
         return new TimeTable(startAt, endAt);
     }
 
-    public WorkDuration getDuration() {
-        int totalMinute = getDurationByMinute();
-        int hour = totalMinute / 60;
-        int minute = totalMinute % 60;
+    private WorkDuration calculateDuration() {
+        int totalMinute = getWorkDurationByMinute();
+        int hour = totalMinute / MINUTE_PER_HOUR;
+        int minute = totalMinute % MINUTE_PER_HOUR;
         return WorkDuration.of(hour, minute);
     }
 
@@ -35,7 +37,7 @@ public class TimeTable {
         return Duration.between(startAt, endAt);
     }
 
-    public int getDurationByMinute() {
+    public int getWorkDurationByMinute() {
         return (int) between().toMinutes();
     }
 

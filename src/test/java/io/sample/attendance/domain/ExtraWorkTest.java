@@ -27,7 +27,7 @@ class ExtraWorkTest {
         // Then
         assertAll(
             () -> assertThat(given.isNightShift()).as("추가 근무 유형").isTrue(),
-            () -> assertThat(given.getDuration()).as("총 작업 시간").isEqualTo(WorkDuration.of(8, 0)),
+            () -> assertThat(given.getWorkDuration()).as("총 작업 시간").isEqualTo(WorkDuration.of(8, 0)),
             () -> assertThat(given.getPay()).as("추가 근로 수당").isEqualTo(72000)
         );
     }
@@ -41,7 +41,7 @@ class ExtraWorkTest {
         // Then
         assertAll(
             () -> assertThat(extraWork.isOvertime()).as("추가 근무 유형").isTrue(),
-            () -> assertThat(extraWork.getDuration()).as("총 작업 시간").isEqualTo(WorkDuration.of(8, 0)),
+            () -> assertThat(extraWork.getWorkDuration()).as("총 작업 시간").isEqualTo(WorkDuration.of(8, 0)),
             () -> assertThat(extraWork.getPay()).as("추가 근로 수당").isEqualTo(48000)
         );
     }
