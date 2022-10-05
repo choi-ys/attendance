@@ -37,10 +37,10 @@ public class AttendanceServiceTest {
 
     @BeforeAll
     static void setUp() {
-        일반_근무 = AttendanceFixtureGenerator.일반_근무_생성();
-        연장근무가_포함된_근무 = AttendanceFixtureGenerator.연장근무가_포함된_근무_생성();
-        야간근무가_포함된_근무 = AttendanceFixtureGenerator.야간근무가_포함된_근무_생성();
-        연장근무와_야간근무가_포함된_근무 = AttendanceFixtureGenerator.연장근무와_야간근무가_포함된_근무_생성();
+        일반_근무 = AttendanceFixtureGenerator.일반_근무();
+        연장근무가_포함된_근무 = AttendanceFixtureGenerator.연장근무가_포함된_근무();
+        야간근무가_포함된_근무 = AttendanceFixtureGenerator.야간근무가_포함된_근무();
+        연장근무와_야간근무가_포함된_근무 = AttendanceFixtureGenerator.연장근무와_야간근무가_포함된_근무();
 
         일반_근무_생성_요청 = AttendanceDto.AttendanceRequest.of(일반_근무.getStartAt(), 일반_근무.getEndAt());
         연장근무가_포함된_근무_생성_요청 = AttendanceDto.AttendanceRequest.of(연장근무가_포함된_근무.getStartAt(), 연장근무가_포함된_근무.getEndAt());
