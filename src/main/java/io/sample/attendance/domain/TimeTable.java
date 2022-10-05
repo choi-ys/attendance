@@ -1,5 +1,7 @@
 package io.sample.attendance.domain;
 
+import static io.sample.attendance.validator.TimeValidator.validateStartAndEndTime;
+
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -18,6 +20,7 @@ public class TimeTable {
     }
 
     public static TimeTable of(LocalDateTime startAt, LocalDateTime endAt) {
+        validateStartAndEndTime(startAt, endAt);
         return new TimeTable(startAt, endAt);
     }
 

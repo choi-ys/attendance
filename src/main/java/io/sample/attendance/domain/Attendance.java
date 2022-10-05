@@ -1,13 +1,13 @@
 package io.sample.attendance.domain;
 
+import static io.sample.attendance.validator.TimeValidator.validateStartAndEndTime;
+
 import java.time.Duration;
 import java.time.LocalDateTime;
 import lombok.Getter;
 
 @Getter
 public class Attendance {
-    public static final String START_AT_AND_END_AT_IS_SAME_ERROR_MESSAGE = "출근시간과 퇴근시간은 같을 수 없습니다.";
-    public static final String END_AT_IS_EARLIER_THAN_START_AT_ERROR_MESSAGE = "퇴근시간이 출근시간 보다 빠를 수 없습니다.";
     public static final int DAILY_STATUTORY_ACTUAL_WORKING_HOUR = 8;
     public static final int MAX_BREAK_TIME_HOUR = 1;
     public static final int DAILY_STATUTORY_WORKING_HOUR = DAILY_STATUTORY_ACTUAL_WORKING_HOUR + MAX_BREAK_TIME_HOUR;
@@ -31,7 +31,7 @@ public class Attendance {
     }
 
     public static Attendance of(LocalDateTime startAt, LocalDateTime endAt) {
-        validateCommuteTime(startAt, endAt);
+        validateStartAndEndTime(startAt, endAt);
         return new Attendance(startAt, endAt);
     }
 
@@ -49,22 +49,5 @@ public class Attendance {
         int hour = totalMinute / 60;
         int minute = totalMinute % 60;
         return WorkDuration.of(hour, minute);
-    }
-
-    private static void validateCommuteTime(LocalDateTime startAt, LocalDateTime endAt) {
-        validateCommuteTimeIsSame(startAt, endAt);
-        validateEndAtIsEarlierThanStartAt(startAt, endAt);
-    }
-
-    private static void validateCommuteTimeIsSame(LocalDateTime startAt, LocalDateTime endAt) {
-        if (startAt.equals(endAt)) {
-            throw new IllegalArgumentException(START_AT_AND_END_AT_IS_SAME_ERROR_MESSAGE);
-        }
-    }
-
-    private static void validateEndAtIsEarlierThanStartAt(LocalDateTime startAt, LocalDateTime endAt) {
-        if (endAt.isBefore(startAt)) {
-            throw new IllegalArgumentException(END_AT_IS_EARLIER_THAN_START_AT_ERROR_MESSAGE);
-        }
     }
 }
