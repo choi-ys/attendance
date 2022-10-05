@@ -2,23 +2,35 @@ package io.sample.attendance.domain;
 
 import io.sample.attendance.utils.NightShiftCalculator;
 import io.sample.attendance.utils.OvertimeCalculator;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import javax.persistence.CascadeType;
+import javax.persistence.Embeddable;
+import javax.persistence.FetchType;
+import javax.persistence.OneToMany;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
+@Embeddable
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ExtraWorks {
-    List<ExtraWork> elements = new ArrayList<>();
+    @OneToMany(mappedBy = "attendance", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ExtraWork> elements = new ArrayList<>();
 
-    public ExtraWorks(LocalDateTime startAt, LocalDateTime endAt) {
-        if (NightShiftCalculator.isNightShift(startAt, endAt)) {
-            elements.addAll(NightShiftCalculator.extract(startAt, endAt));
+    private ExtraWorks(Attendance attendance) {
+        if (NightShiftCalculator.isNightShift(attendance)) {
+            elements.addAll(NightShiftCalculator.extract(attendance));
         }
 
-        if (OvertimeCalculator.isOverTime(startAt, endAt)) {
-            elements.add(OvertimeCalculator.extract(startAt, endAt));
+        if (OvertimeCalculator.isOverTime(attendance)) {
+            elements.add(OvertimeCalculator.extract(attendance));
         }
+    }
+
+    public static ExtraWorks from(Attendance attendance) {
+        return new ExtraWorks(attendance);
     }
 
     public int getSize() {
@@ -42,14 +54,6 @@ public class ExtraWorks {
             .filter(ExtraWork::isOvertime)
             .findFirst()
             .orElse(null);
-    }
-
-    public WorkDuration getOvertimeDuration() {
-        ExtraWork overTime = getOverTime();
-        if (overTime != null) {
-            return overTime.getWorkDuration();
-        }
-        return WorkDuration.empty();
     }
 
     public List<ExtraWork> getNightShifts() {

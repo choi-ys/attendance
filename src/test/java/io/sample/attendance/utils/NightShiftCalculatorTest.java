@@ -3,6 +3,7 @@ package io.sample.attendance.utils;
 import static io.sample.attendance.fixture.TestCaseArgumentsGenerator.add;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import io.sample.attendance.domain.Attendance;
 import io.sample.attendance.domain.ExtraWork;
 import io.sample.attendance.domain.ExtraWorkType;
 import io.sample.attendance.fixture.TestCaseArgumentsGenerator;
@@ -30,7 +31,8 @@ class NightShiftCalculatorTest {
         final boolean expected
     ) {
         // When & Then
-        assertThat(NightShiftCalculator.isNightShift(startAt, endAt)).isEqualTo(expected);
+        Attendance given = Attendance.of(startAt, endAt);
+        assertThat(NightShiftCalculator.isNightShift(given)).isEqualTo(expected);
     }
 
     private static Stream<Arguments> isNightShift() {
@@ -54,8 +56,9 @@ class NightShiftCalculatorTest {
         final LocalDateTime endAt,
         final List<ExtraWork> expected
     ) {
-        // When                                                                                                                                 ₩
-        List<ExtraWork> extract = NightShiftCalculator.extract(startAt, endAt);
+        // When
+        Attendance given = Attendance.of(startAt, endAt);
+        List<ExtraWork> extract = NightShiftCalculator.extract(given);
 
         // Then
         assertThat(extract).containsExactlyElementsOf(expected);
@@ -70,6 +73,7 @@ class NightShiftCalculatorTest {
                 add(TestCaseArgumentsGenerator::oneNightShiftSectionAndOneWorkDay,
                     Collections.singletonList(
                         ExtraWork.of(
+                            null,
                             LocalDateTime.of(today, LocalTime.of(22, 0)),
                             LocalDateTime.of(today, LocalTime.of(22, 1)),
                             ExtraWorkType.NIGHT_SHIFT
@@ -81,6 +85,7 @@ class NightShiftCalculatorTest {
                 add(TestCaseArgumentsGenerator::oneNightShiftSectionAndTwoWorkDay,
                     Collections.singletonList(
                         ExtraWork.of(
+                            null,
                             LocalDateTime.of(today, LocalTime.of(22, 0)),
                             LocalDateTime.of(nextDay, LocalTime.of(6, 0)),
                             ExtraWorkType.NIGHT_SHIFT
@@ -92,11 +97,13 @@ class NightShiftCalculatorTest {
                 add(TestCaseArgumentsGenerator::twoNightShiftSectionAndOneWorkDay,
                     Arrays.asList(
                         ExtraWork.of(
+                            null,
                             LocalDateTime.of(today, LocalTime.of(5, 59)),
                             LocalDateTime.of(today, LocalTime.of(6, 0)),
                             ExtraWorkType.NIGHT_SHIFT
                         ),
                         ExtraWork.of(
+                            null,
                             LocalDateTime.of(today, LocalTime.of(22, 0)),
                             LocalDateTime.of(today, LocalTime.of(22, 1)),
                             ExtraWorkType.NIGHT_SHIFT
@@ -108,11 +115,13 @@ class NightShiftCalculatorTest {
                 add(TestCaseArgumentsGenerator::twoNightShiftSectionAndTwoWorkDay,
                     Arrays.asList(
                         ExtraWork.of(
+                            null,
                             LocalDateTime.of(today, LocalTime.of(22, 0)),
                             LocalDateTime.of(nextDay, LocalTime.of(6, 0)),
                             ExtraWorkType.NIGHT_SHIFT
                         ),
                         ExtraWork.of(
+                            null,
                             LocalDateTime.of(nextDay, LocalTime.of(22, 0)),
                             LocalDateTime.of(nextDay, LocalTime.of(22, 1)),
                             ExtraWorkType.NIGHT_SHIFT
@@ -124,6 +133,7 @@ class NightShiftCalculatorTest {
                 add(TestCaseArgumentsGenerator::oneNightShiftSectionAndTwoWorkDayAndMaximumWork,
                     Collections.singletonList(
                         ExtraWork.of(
+                            null,
                             LocalDateTime.of(today, LocalTime.of(22, 0)),
                             LocalDateTime.of(nextDay, LocalTime.of(6, 0)),
                             ExtraWorkType.NIGHT_SHIFT
@@ -135,11 +145,13 @@ class NightShiftCalculatorTest {
                 add(TestCaseArgumentsGenerator::twoNightShiftSectionAndTwoWorkDayAndMaximumWork,
                     Arrays.asList(
                         ExtraWork.of(
+                            null,
                             LocalDateTime.of(today, LocalTime.of(22, 0)),
                             LocalDateTime.of(nextDay, LocalTime.of(6, 0)),
                             ExtraWorkType.NIGHT_SHIFT
                         ),
                         ExtraWork.of(
+                            null,
                             LocalDateTime.of(nextDay, LocalTime.of(22, 0)),
                             LocalDateTime.of(nextDay, LocalTime.of(23, 59)),
                             ExtraWorkType.NIGHT_SHIFT
@@ -151,11 +163,13 @@ class NightShiftCalculatorTest {
                 add(TestCaseArgumentsGenerator::twoNightShiftSectionAndThreeWorkDayAndMaximumWork,
                     Arrays.asList(
                         ExtraWork.of(
+                            null,
                             LocalDateTime.of(today, LocalTime.of(22, 0)),
                             LocalDateTime.of(nextDay, LocalTime.of(6, 0)),
                             ExtraWorkType.NIGHT_SHIFT
                         ),
                         ExtraWork.of(
+                            null,
                             LocalDateTime.of(nextDay, LocalTime.of(22, 0)),
                             LocalDateTime.of(afterTwoDays, LocalTime.of(1, 59)),
                             ExtraWorkType.NIGHT_SHIFT

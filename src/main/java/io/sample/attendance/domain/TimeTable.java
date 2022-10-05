@@ -5,14 +5,29 @@ import static io.sample.attendance.validator.TimeValidator.validateStartAndEndTi
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Objects;
+import javax.persistence.Column;
+import javax.persistence.Embeddable;
+import javax.persistence.Transient;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.AccessType;
+import org.springframework.data.annotation.AccessType.Type;
 
 @Getter
+@Embeddable
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AccessType(Type.FIELD)
 public class TimeTable {
     public static final int MINUTE_PER_HOUR = 60;
 
+    @Column
     private LocalDateTime startAt;
+
+    @Column
     private LocalDateTime endAt;
+
+    @Transient
     private WorkDuration workDuration;
 
     private TimeTable(LocalDateTime startAt, LocalDateTime endAt) {

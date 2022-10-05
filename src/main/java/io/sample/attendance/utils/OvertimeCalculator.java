@@ -1,5 +1,6 @@
 package io.sample.attendance.utils;
 
+import io.sample.attendance.domain.Attendance;
 import io.sample.attendance.domain.ExtraWork;
 import io.sample.attendance.domain.ExtraWorkType;
 import java.time.Duration;
@@ -11,13 +12,13 @@ public class OvertimeCalculator {
     public static final int DAILY_STATUTORY_WORKING_HOUR = DAILY_STATUTORY_ACTUAL_WORKING_HOUR + MAX_BREAK_TIME_HOUR;
     public static final int DAILY_STATUTORY_WORKING_MINUTE = 540;
 
-    public static boolean isOverTime(LocalDateTime startAt, LocalDateTime endAt) {
-        Duration between = Duration.between(startAt, endAt);
+    public static boolean isOverTime(Attendance attendance) {
+        Duration between = Duration.between(attendance.getStartAt(), attendance.getEndAt());
         return between.toMinutes() > DAILY_STATUTORY_WORKING_MINUTE;
     }
 
-    public static ExtraWork extract(LocalDateTime startAt, LocalDateTime endAt) {
-        return ExtraWork.of(findOvertimeStartAt(startAt), endAt, ExtraWorkType.OVERTIME);
+    public static ExtraWork extract(Attendance attendance) {
+        return ExtraWork.of(attendance, findOvertimeStartAt(attendance.getStartAt()), attendance.getEndAt(), ExtraWorkType.OVERTIME);
     }
 
     private static LocalDateTime findOvertimeStartAt(LocalDateTime startAt) {

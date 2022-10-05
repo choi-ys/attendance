@@ -2,6 +2,7 @@ package io.sample.attendance.utils;
 
 import static org.hibernate.type.IntegerType.ZERO;
 
+import io.sample.attendance.domain.Attendance;
 import io.sample.attendance.domain.ExtraWork;
 import io.sample.attendance.domain.ExtraWorkType;
 import java.time.LocalDateTime;
@@ -16,8 +17,7 @@ public class NightShiftCalculator {
     public static final LocalTime NIGHT_SHIFT_END_TIME = LocalTime.of(NIGHT_SHIFT_END_HOUR, ZERO);
 
     /**
-     * @param startAt 출근 시간 (YYYY-MM-DD hh:mm)
-     * @param endAt   퇴근 시간 (YYYY-MM-DD hh:mm)
+     * @param attendance 일일 근태 정보
      * @return 야간 근무 여부
      * @implNote 야간 근무 여부를 판별 한다.
      * <pre>
@@ -28,31 +28,29 @@ public class NightShiftCalculator {
      * }
      * </pre>
      */
-    public static boolean isNightShift(LocalDateTime startAt, LocalDateTime endAt) {
-        return isNotSameDayWork(startAt, endAt) || isIncludeStartOrEnd(startAt, endAt);
+    public static boolean isNightShift(Attendance attendance) {
+        return isNotSameDayWork(attendance) || isIncludeStartOrEnd(attendance);
     }
 
-    private static boolean isNotSameDayWork(LocalDateTime startAt, LocalDateTime endAt) {
-        return !isSameDayWork(startAt, endAt);
+    private static boolean isNotSameDayWork(Attendance attendance) {
+        return !isSameDayWork(attendance);
     }
 
     /**
-     * @param startAt 출근 시간 (YYYY-MM-DD hh:mm)
-     * @param endAt   퇴근 시간 (YYYY-MM-DD hh:mm)
+     * @param attendance 일일 근태 정보
      * @return 당일 퇴근 여부
      * @implNote 출근 일자와 퇴근 일자를 비교하여 당일 퇴근 여부를 판별한다.
      */
-    private static boolean isSameDayWork(LocalDateTime startAt, LocalDateTime endAt) {
-        return startAt.getDayOfMonth() == endAt.getDayOfMonth();
+    private static boolean isSameDayWork(Attendance attendance) {
+        return attendance.getStartAt().getDayOfMonth() == attendance.getEndAt().getDayOfMonth();
     }
 
     /**
-     * @param startAt 출근 시간 (YYYY-MM-DD hh:mm)
-     * @param endAt   퇴근 시간 (YYYY-MM-DD hh:mm)
+     * @param attendance 일일 근태 정보
      * @return 출근 혹은 퇴근 시간이 야간 근무 산정 범위에 포함되는지 여부
      */
-    private static boolean isIncludeStartOrEnd(LocalDateTime startAt, LocalDateTime endAt) {
-        return isBetween(startAt.toLocalTime()) || isBetween(endAt.toLocalTime());
+    private static boolean isIncludeStartOrEnd(Attendance attendance) {
+        return isBetween(attendance.getStartAt().toLocalTime()) || isBetween(attendance.getEndAt().toLocalTime());
     }
 
     /**
@@ -64,21 +62,19 @@ public class NightShiftCalculator {
     }
 
     /**
-     * @param startAt 출근 시간 (YYYY-MM-DD hh:mm)
-     * @param endAt   퇴근 시간 (YYYY-MM-DD hh:mm)
+     * @param attendance 일일 근태 정보
      * @return 야간 근무 구간
      * @implNote 출/퇴근 시간으로부터 근무 중 야간 근무에 해당하는 구간을 추출한다.
      */
-    public static List<ExtraWork> extract(LocalDateTime startAt, LocalDateTime endAt) {
+    public static List<ExtraWork> extract(Attendance attendance) {
         List<LocalDateTime> hoursOfNightShiftRange = new ArrayList<>();
         List<Integer> nightShiftEndHoursIndices = new ArrayList<>();
-        filterHoursOfNightShiftRange(startAt, endAt, hoursOfNightShiftRange, nightShiftEndHoursIndices);
-        return extractNightShiftSections(startAt, endAt, hoursOfNightShiftRange, nightShiftEndHoursIndices);
+        filterHoursOfNightShiftRange(attendance, hoursOfNightShiftRange, nightShiftEndHoursIndices);
+        return extractNightShiftSections(attendance, hoursOfNightShiftRange, nightShiftEndHoursIndices);
     }
 
     /**
-     * @param startAt                   출근 시간 (YYYY-MM-DD hh:mm)
-     * @param endAt                     퇴근 시간 (YYYY-MM-DD hh:mm)
+     * @param attendance                일일 근태 정보
      * @param hoursOfNightShiftRange    출근 시간부터 퇴근시간 까지의 근무 시간 중 야간 근무 산정 범위에 포함되는 시간대 목록
      * @param nightShiftEndHoursIndices 야간 근무 산정 범위에 포함되는 시간 대 배열의 원소 중 야간 근무 종료 시간 원소의 위치
      * @implNote 전체 근무 시간 중 야간 근무 구간의 시작/종료 시간 추출을 위해, 야간 근무 산정 범위에 포함되는 시간대만 필터링한다.
@@ -90,12 +86,12 @@ public class NightShiftCalculator {
      * </pre>
      */
     private static void filterHoursOfNightShiftRange(
-        LocalDateTime startAt,
-        LocalDateTime endAt,
+        Attendance attendance,
         List<LocalDateTime> hoursOfNightShiftRange,
         List<Integer> nightShiftEndHoursIndices
     ) {
-        LocalDateTime startCondition = startAt.withMinute(0);
+        LocalDateTime startCondition = attendance.getStartAt().withMinute(0);
+        LocalDateTime endAt = attendance.getEndAt();
         startCondition = checkFistCondition(startCondition);
         int index = 0;
         while (!startCondition.isAfter(endAt)) {
@@ -140,44 +136,40 @@ public class NightShiftCalculator {
     }
 
     /**
-     * @param startAt                   출근 시간 (YYYY-MM-DD hh:mm)
-     * @param endAt                     퇴근 시간 (YYYY-MM-DD hh:mm)
+     * @param attendance                일일 근태 정보
      * @param hoursOfNightShiftRange    출근 시간부터 퇴근시간 까지의 근무 시간 중 야간 근무 산정 범위에 포함되는 시간대 목록
      * @param nightShiftEndHoursIndices 야간 근무 산정 범위에 포함되는 시간 대 배열의 원소 중 야간 근무 종료 시간 원소의 위치
      * @return 야간 근무 구간 목록
      * @implNote 야간 근무 산정 범위에 포함된 시간대 목록을 이용하여 야간 근무 구간을 추출한다.
      */
     private static List<ExtraWork> extractNightShiftSections(
-        LocalDateTime startAt,
-        LocalDateTime endAt,
+        Attendance attendance,
         List<LocalDateTime> hoursOfNightShiftRange,
         List<Integer> nightShiftEndHoursIndices
     ) {
         List<ExtraWork> extraWorks = new ArrayList<>();
-        extraWorks.add(findFirstSection(startAt, endAt, hoursOfNightShiftRange, nightShiftEndHoursIndices));
+        extraWorks.add(findFirstSection(attendance, hoursOfNightShiftRange, nightShiftEndHoursIndices));
         if (hasMoreSection(hoursOfNightShiftRange, nightShiftEndHoursIndices)) {
-            extraWorks.add(findSecondSection(endAt, hoursOfNightShiftRange, nightShiftEndHoursIndices));
+            extraWorks.add(findSecondSection(attendance, hoursOfNightShiftRange, nightShiftEndHoursIndices));
         }
         return extraWorks;
     }
 
     /**
-     * @param startAt                   출근 시간 (YYYY-MM-DD hh:mm)
-     * @param endAt                     퇴근 시간 (YYYY-MM-DD hh:mm)
+     * @param attendance                일일 근태 정보
      * @param hoursOfNightShiftRange    출근 시간부터 퇴근시간 까지의 근무 시간 중 야간 근무 산정 범위에 포함되는 시간대 목록
      * @param nightShiftEndHoursIndices 야간 근무 산정 범위에 포함되는 시간 대 배열의 원소 중 야간 근무 종료 시간 원소의 위치
      * @return 첫번째 야간 근무 구간
      * @implNote 첫번째 야간 근무 구간을 추출한다.
      */
     private static ExtraWork findFirstSection(
-        LocalDateTime startAt,
-        LocalDateTime endAt,
+        Attendance attendance,
         List<LocalDateTime> hoursOfNightShiftRange,
         List<Integer> nightShiftEndHoursIndices
     ) {
-        LocalDateTime nightShiftStartAt = findFirstSectionStartAt(startAt, hoursOfNightShiftRange);
-        LocalDateTime nightShiftEndAt = findFirstSectionEndAt(endAt, hoursOfNightShiftRange, nightShiftEndHoursIndices);
-        return ExtraWork.of(nightShiftStartAt, nightShiftEndAt, ExtraWorkType.NIGHT_SHIFT);
+        LocalDateTime nightShiftStartAt = findFirstSectionStartAt(attendance.getStartAt(), hoursOfNightShiftRange);
+        LocalDateTime nightShiftEndAt = findFirstSectionEndAt(attendance.getEndAt(), hoursOfNightShiftRange, nightShiftEndHoursIndices);
+        return ExtraWork.of(attendance, nightShiftStartAt, nightShiftEndAt, ExtraWorkType.NIGHT_SHIFT);
     }
 
     /**
@@ -245,7 +237,7 @@ public class NightShiftCalculator {
     }
 
     /**
-     * @param endAt                     퇴근 시간 (YYYY-MM-DD hh:mm)
+     * @param attendance                일일 근태 정보
      * @param hoursOfNightShiftRange    출근 시간부터 퇴근시간 까지의 근무 시간 중 야간 근무 산정 범위에 포함되는 시간대 목록
      * @param nightShiftEndHoursIndices 야간 근무 산정 범위에 포함되는 시간 대 배열의 원소 중 야간 근무 종료 시간 원소의 위치
      * @return 두번째 야간 근무 구간
@@ -260,14 +252,15 @@ public class NightShiftCalculator {
      * </pre>
      */
     private static ExtraWork findSecondSection(
-        LocalDateTime endAt,
+        Attendance attendance,
         List<LocalDateTime> hoursOfNightShiftRange,
         List<Integer> nightShiftEndHoursIndices
     ) {
         LocalDateTime nightShiftStartAt = hoursOfNightShiftRange.get(nightShiftEndHoursIndices.get(0) + 1);
+        LocalDateTime endAt = attendance.getEndAt();
         if (isNightShiftHour(endAt.toLocalTime())) {
-            return ExtraWork.of(nightShiftStartAt, endAt, ExtraWorkType.NIGHT_SHIFT);
+            return ExtraWork.of(attendance, nightShiftStartAt, endAt, ExtraWorkType.NIGHT_SHIFT);
         }
-        return ExtraWork.of(nightShiftStartAt, endAt.withHour(6).withMinute(0), ExtraWorkType.NIGHT_SHIFT);
+        return ExtraWork.of(attendance, nightShiftStartAt, endAt.withHour(6).withMinute(0), ExtraWorkType.NIGHT_SHIFT);
     }
 }

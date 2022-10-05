@@ -22,7 +22,7 @@ class ExtraWorkTest {
     @DisplayName("추가 근무 정보 생성 : 야간 근무")
     public void createNightShiftTypeExtraWork() {
         // When
-        ExtraWork given = ExtraWork.of(startAt, endAt, ExtraWorkType.NIGHT_SHIFT);
+        ExtraWork given = ExtraWork.of(null, startAt, endAt, ExtraWorkType.NIGHT_SHIFT);
 
         // Then
         assertAll(
@@ -36,7 +36,7 @@ class ExtraWorkTest {
     @DisplayName("추가 근무 정보 생성 : 연장 근무")
     public void createOvertimeTypeExtraWork() {
         // When
-        ExtraWork extraWork = ExtraWork.of(startAt, endAt, ExtraWorkType.OVERTIME);
+        ExtraWork extraWork = ExtraWork.of(null, startAt, endAt, ExtraWorkType.OVERTIME);
 
         // Then
         assertAll(

@@ -2,6 +2,7 @@ package io.sample.attendance.utils;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import io.sample.attendance.domain.Attendance;
 import io.sample.attendance.domain.ExtraWork;
 import io.sample.attendance.domain.TimeTable;
 import io.sample.attendance.domain.WorkDuration;
@@ -26,7 +27,8 @@ class OvertimeCalculatorTest {
         final boolean expected
     ) {
         // When & Then
-        assertThat(OvertimeCalculator.isOverTime(startAt, endAt)).isEqualTo(expected);
+        Attendance given = Attendance.of(startAt, endAt);
+        assertThat(OvertimeCalculator.isOverTime(given)).isEqualTo(expected);
     }
 
     private static Stream<Arguments> isOvertime() {
@@ -53,7 +55,8 @@ class OvertimeCalculatorTest {
         final LocalDateTime startAt = LocalDateTime.of(today, LocalTime.of(9, 0));
         final LocalDateTime endAt = LocalDateTime.of(today, LocalTime.of(18, 1));
 
-        ExtraWork given = OvertimeCalculator.extract(startAt, endAt);
+        Attendance attendance = Attendance.of(startAt, endAt);
+        ExtraWork given = OvertimeCalculator.extract(attendance);
 
         // When & Then
         assertThat(given.getPay()).isEqualTo(100);

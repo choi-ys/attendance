@@ -20,9 +20,10 @@ class ExtraWorksTest {
         // Given
         final LocalDateTime startAt = LocalDateTime.of(today, LocalTime.of(9, 0));
         final LocalDateTime endAt = LocalDateTime.of(today, LocalTime.of(18, 0));
+        Attendance attendance = Attendance.of(startAt, endAt);
 
         // When
-        ExtraWorks given = new ExtraWorks(startAt, endAt);
+        ExtraWorks given = ExtraWorks.from(attendance);
 
         // Then
         assertAll(
@@ -38,9 +39,10 @@ class ExtraWorksTest {
         // Given
         final LocalDateTime startAt = LocalDateTime.of(today, LocalTime.of(9, 0));
         final LocalDateTime endAt = LocalDateTime.of(today, LocalTime.of(20, 1));
+        Attendance attendance = Attendance.of(startAt, endAt);
 
         // When
-        ExtraWorks given = new ExtraWorks(startAt, endAt);
+        ExtraWorks given = ExtraWorks.from(attendance);
 
         // Then
         assertAll(
@@ -56,9 +58,10 @@ class ExtraWorksTest {
         // Given
         final LocalDateTime startAt = LocalDateTime.of(today, LocalTime.of(22, 0));
         final LocalDateTime endAt = LocalDateTime.of(nextDay, LocalTime.of(6, 0));
+        Attendance attendance = Attendance.of(startAt, endAt);
 
         // When
-        ExtraWorks given = new ExtraWorks(startAt, endAt);
+        ExtraWorks given = ExtraWorks.from(attendance);
 
         // Then
         assertAll(
@@ -74,9 +77,10 @@ class ExtraWorksTest {
         // Given
         final LocalDateTime startAt = LocalDateTime.of(today, LocalTime.of(5, 20));
         final LocalDateTime endAt = LocalDateTime.of(nextDay, LocalTime.of(6, 0));
+        Attendance attendance = Attendance.of(startAt, endAt);
 
         // When
-        ExtraWorks given = new ExtraWorks(startAt, endAt);
+        ExtraWorks given = ExtraWorks.from(attendance);
 
         // Then
         assertAll(
