@@ -2,7 +2,6 @@ package io.sample.attendance.domain;
 
 import static io.sample.attendance.validator.TimeValidator.validateStartAndEndTime;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
 import lombok.Getter;
 
@@ -14,17 +13,15 @@ public class Attendance {
     public static final int DAILY_STATUTORY_WORKING_MINUTE = 540;
     public static final int BASIC_PAY_PER_HOUR = 10000;
 
-    private LocalDateTime startAt;
-    private LocalDateTime endAt;
+    private TimeTable timeTable;
     private WorkDuration workDuration;
     private ExtraWorks extraWorks;
     private int basicPay;
     private int totalPay;
 
     private Attendance(LocalDateTime startAt, LocalDateTime endAt) {
-        this.startAt = startAt;
-        this.endAt = endAt;
-        this.workDuration = calculateWorkingTime();
+        this.timeTable = TimeTable.of(startAt, endAt);
+        this.workDuration = timeTable.getDuration();
         this.extraWorks = new ExtraWorks(startAt, endAt);
         this.basicPay = calculateBasicPay();
         this.totalPay = calculateTotalPay();
@@ -41,13 +38,5 @@ public class Attendance {
 
     private int calculateTotalPay() {
         return basicPay + extraWorks.getTotalExtraPay();
-    }
-
-    private WorkDuration calculateWorkingTime() {
-        Duration between = Duration.between(startAt, endAt);
-        int totalMinute = (int) between.toMinutes();
-        int hour = totalMinute / 60;
-        int minute = totalMinute % 60;
-        return WorkDuration.of(hour, minute);
     }
 }

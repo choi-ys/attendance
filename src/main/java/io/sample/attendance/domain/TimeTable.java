@@ -25,11 +25,13 @@ public class TimeTable {
     }
 
     public WorkDuration getDuration() {
-        Duration between = between();
-        return WorkDuration.of((int) between.toHours(), between.toMinutesPart());
+        int totalMinute = getDurationByMinute();
+        int hour = totalMinute / 60;
+        int minute = totalMinute % 60;
+        return WorkDuration.of(hour, minute);
     }
 
-    private Duration between() {
+    public Duration between() {
         return Duration.between(startAt, endAt);
     }
 

@@ -25,8 +25,8 @@ public class DailyPayStubView {
     }
 
     private static void attendanceGuideMessage(Attendance attendance) {
-        stringBuffer.append(START_AT).append(removeT(attendance.getStartAt())).append(LINE_SEPARATOR);
-        stringBuffer.append(END_AT).append(removeT(attendance.getEndAt())).append(LINE_SEPARATOR);
+        stringBuffer.append(START_AT).append(removeT(attendance.getTimeTable().getStartAt())).append(LINE_SEPARATOR);
+        stringBuffer.append(END_AT).append(removeT(attendance.getTimeTable().getEndAt())).append(LINE_SEPARATOR);
         stringBuffer.append(SPLIT_LINE).append(LINE_SEPARATOR);
         stringBuffer.append(TOTAL_PAY).append(addKRW(attendance.getTotalPay())).append(LINE_SEPARATOR);
         stringBuffer.append(TOTAL_WORKING_TIME).append(workingTimeToString(attendance.getWorkDuration())).append(LINE_SEPARATOR);
