@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: daily-pay-calculator
+  profiles:
+    active: local
+
+  jpa:
+    open-in-view: false
