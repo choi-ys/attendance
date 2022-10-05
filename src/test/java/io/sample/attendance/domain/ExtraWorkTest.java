@@ -22,13 +22,13 @@ class ExtraWorkTest {
     @DisplayName("추가 근무 정보 생성 : 야간 근무")
     public void createNightShiftTypeExtraWork() {
         // When
-        ExtraWork extraWork = ExtraWork.of(startAt, endAt, ExtraWorkType.NIGHT_SHIFT);
+        ExtraWork given = ExtraWork.of(startAt, endAt, ExtraWorkType.NIGHT_SHIFT);
 
         // Then
         assertAll(
-            () -> assertThat(extraWork.isNightShift()).as("추가 근무 유형").isTrue(),
-            () -> assertThat(extraWork.getDuration()).as("총 작업 시간").isEqualTo(WorkDuration.of(8, 0)),
-            () -> assertThat(extraWork.getPay()).as("추가 근로 수당").isEqualTo(72000)
+            () -> assertThat(given.isNightShift()).as("추가 근무 유형").isTrue(),
+            () -> assertThat(given.getDuration()).as("총 작업 시간").isEqualTo(WorkDuration.of(8, 0)),
+            () -> assertThat(given.getPay()).as("추가 근로 수당").isEqualTo(72000)
         );
     }
 

@@ -36,4 +36,39 @@ public class ExtraWorks {
             .map(ExtraWork::getExtraWorkType)
             .collect(Collectors.toSet());
     }
+
+    public ExtraWork getOverTime() {
+        return elements.stream()
+            .filter(ExtraWork::isOvertime)
+            .findFirst()
+            .orElse(null);
+    }
+
+    public WorkDuration getOvertimeDuration() {
+        ExtraWork overTime = getOverTime();
+        if (overTime != null) {
+            return overTime.getDuration();
+        }
+        return WorkDuration.empty();
+    }
+
+    public List<ExtraWork> getNightShifts() {
+        return elements.stream()
+            .filter(ExtraWork::isNightShift)
+            .collect(Collectors.toList());
+    }
+
+    public int getTotalNightShiftPay() {
+        return getNightShifts().stream()
+            .mapToInt(ExtraWork::getPay)
+            .sum();
+    }
+
+    public WorkDuration getNightShiftDuration() {
+        return elements.stream()
+            .filter(ExtraWork::isNightShift)
+            .map(ExtraWork::getDuration)
+            .reduce((x, y) -> WorkDuration.of(x.getHour() + y.getHour(), x.getMinute() + y.getMinute()))
+            .orElseGet(WorkDuration::empty);
+    }
 }

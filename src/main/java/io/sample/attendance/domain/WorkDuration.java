@@ -32,6 +32,10 @@ public class WorkDuration {
         return hour >= MAXIMUM_HOURS && minute > ZERO;
     }
 
+    public static WorkDuration empty() {
+        return new WorkDuration(ZERO, ZERO);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
