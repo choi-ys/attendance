@@ -1,8 +1,11 @@
 package io.sample.attendance.dto;
 
 import io.sample.attendance.domain.Attendance;
+import io.sample.attendance.domain.ExtraWorks;
 import io.sample.attendance.domain.WorkDuration;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -37,7 +40,7 @@ public class AttendanceDto {
         private WorkDuration workDuration;
         private int basicPay;
         private int totalPay;
-        private ExtraWorksResponse extraWorksResponse;
+        private List<ExtraWorkResponse> extraWorks;
 
         public AttendanceResponse(
             Long id,
@@ -46,7 +49,7 @@ public class AttendanceDto {
             WorkDuration workDuration,
             int basicPay,
             int totalPay,
-            ExtraWorksResponse extraWorksResponse
+            List<ExtraWorkResponse> extraWorks
         ) {
             this.id = id;
             this.startAt = startAt;
@@ -54,10 +57,10 @@ public class AttendanceDto {
             this.workDuration = workDuration;
             this.basicPay = basicPay;
             this.totalPay = totalPay;
-            this.extraWorksResponse = extraWorksResponse;
+            this.extraWorks = extraWorks;
         }
 
-        public static AttendanceResponse from(Attendance attendance) {
+        public static AttendanceResponse toResponse(Attendance attendance) {
             return new AttendanceResponse(
                 attendance.getId(),
                 attendance.getStartAt(),
@@ -65,8 +68,16 @@ public class AttendanceDto {
                 attendance.getWorkDuration(),
                 attendance.getBasicPay(),
                 attendance.getTotalPay(),
-                ExtraWorksResponse.from(attendance.getExtraWorks())
+                toResponse(attendance.getExtraWorks())
             );
+        }
+
+        private static List<ExtraWorkResponse> toResponse(ExtraWorks extraWorks) {
+            return extraWorks
+                .getElements()
+                .stream()
+                .map(ExtraWorkResponse::from)
+                .collect(Collectors.toList());
         }
     }
 }

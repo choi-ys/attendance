@@ -15,6 +15,6 @@ public class AttendanceService {
 
     @Transactional
     public AttendanceResponse saveAttendance(AttendanceRequest attendanceRequest) {
-        return AttendanceResponse.from(attendanceRepo.save(attendanceRequest.toEntity()));
+        return AttendanceResponse.toResponse(attendanceRepo.save(attendanceRequest.toEntity()));
     }
 }
