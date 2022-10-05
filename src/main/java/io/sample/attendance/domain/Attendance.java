@@ -14,14 +14,12 @@ public class Attendance {
     public static final int BASIC_PAY_PER_HOUR = 10000;
 
     private TimeTable timeTable;
-    private WorkDuration workDuration;
     private ExtraWorks extraWorks;
     private int basicPay;
     private int totalPay;
 
     private Attendance(LocalDateTime startAt, LocalDateTime endAt) {
         this.timeTable = TimeTable.of(startAt, endAt);
-        this.workDuration = timeTable.getWorkDuration();
         this.extraWorks = new ExtraWorks(startAt, endAt);
         this.basicPay = calculateBasicPay();
         this.totalPay = calculateTotalPay();
@@ -33,10 +31,14 @@ public class Attendance {
     }
 
     private int calculateBasicPay() {
-        return workDuration.getHour() * BASIC_PAY_PER_HOUR;
+        return timeTable.getWorkDuration().getHour() * BASIC_PAY_PER_HOUR;
     }
 
     private int calculateTotalPay() {
         return basicPay + extraWorks.getTotalExtraPay();
+    }
+
+    public WorkDuration getWorkDuration() {
+        return timeTable.getWorkDuration();
     }
 }
