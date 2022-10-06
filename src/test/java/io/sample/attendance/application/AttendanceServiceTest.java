@@ -6,14 +6,19 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 
 import io.sample.attendance.domain.Attendance;
+import io.sample.attendance.domain.ExtraWorkType;
 import io.sample.attendance.dto.AttendanceDto;
 import io.sample.attendance.dto.AttendanceDto.AttendanceRequest;
 import io.sample.attendance.dto.AttendanceDto.AttendanceResponse;
+import io.sample.attendance.dto.ExtraWorkResponse;
 import io.sample.attendance.fixture.AttendanceFixtureGenerator;
 import io.sample.attendance.repo.AttendanceRepo;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -63,7 +68,8 @@ public class AttendanceServiceTest {
         AttendanceResponse 근무_생성_응답 = attendanceService.saveAttendance(근무_생성_요청);
 
         // Then
-        근무_생성_검증(근무, 근무_생성_응답);
+        근무_응답_항목_검증(근무, 근무_생성_응답);
+        verify(attendanceRepo).save(근무);
     }
 
     private static Stream<Arguments> saveAttendance() {
@@ -75,18 +81,39 @@ public class AttendanceServiceTest {
         );
     }
 
+    @Test
+    @DisplayName("특정 근태 기록 조회")
+    public void findAttendanceById() {
+        // Given
+        근무_조회_제어(연장근무가_포함된_근무);
+
+        // When
+        AttendanceResponse 근무_조회_응답 = attendanceService.findAttendanceResponseById(연장근무가_포함된_근무.getId());
+
+        // Then
+        근무_응답_항목_검증(연장근무가_포함된_근무, 근무_조회_응답);
+        verify(attendanceRepo).findById(연장근무가_포함된_근무.getId());
+    }
+
     private void 근무_생성_제어(Attendance attendance) {
         given(attendanceRepo.save(attendance)).will(AdditionalAnswers.returnsFirstArg());
     }
 
-    private void 근무_생성_검증(Attendance 근무, AttendanceResponse 정규_근무_생성_응답) {
+    private void 근무_조회_제어(Attendance attendance) {
+        given(attendanceRepo.findById(attendance.getId())).willReturn(Optional.of(attendance));
+    }
+
+    private void 근무_응답_항목_검증(Attendance 근무, AttendanceResponse 근무_응답) {
+        Set<ExtraWorkType> 추가_근무_타입 = 근무.getExtraWorks().getExtraWorkTypes();
         assertAll(
-            () -> assertThat(정규_근무_생성_응답.getId()).isEqualTo(근무.getId()),
-            () -> assertThat(정규_근무_생성_응답.getStartAt()).isEqualTo(근무.getStartAt()),
-            () -> assertThat(정규_근무_생성_응답.getEndAt()).isEqualTo(근무.getEndAt()),
-            () -> assertThat(정규_근무_생성_응답.getBasicPay()).isEqualTo(근무.getBasicPay()),
-            () -> assertThat(정규_근무_생성_응답.getTotalPay()).isEqualTo(근무.getTotalPay())
+            () -> assertThat(근무_응답.getId()).isEqualTo(근무.getId()),
+            () -> assertThat(근무_응답.getStartAt()).isEqualTo(근무.getStartAt()),
+            () -> assertThat(근무_응답.getEndAt()).isEqualTo(근무.getEndAt()),
+            () -> assertThat(근무_응답.getBasicPay()).isEqualTo(근무.getBasicPay()),
+            () -> assertThat(근무_응답.getTotalPay()).isEqualTo(근무.getTotalPay()),
+            () -> assertThat(근무_응답.getExtraWorks())
+                .extracting(ExtraWorkResponse::getExtraWorkType)
+                .containsAnyElementsOf(추가_근무_타입)
         );
-        verify(attendanceRepo).save(근무);
     }
 }
