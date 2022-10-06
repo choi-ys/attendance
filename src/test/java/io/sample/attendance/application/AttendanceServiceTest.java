@@ -32,17 +32,17 @@ public class AttendanceServiceTest {
     @InjectMocks
     private AttendanceService attendanceService;
 
-    static Attendance 일반_근무, 연장근무가_포함된_근무, 야간근무가_포함된_근무, 연장근무와_야간근무가_포함된_근무;
-    static AttendanceRequest 일반_근무_생성_요청, 연장근무가_포함된_근무_생성_요청, 야간근무가_포함된_근무_생성_요청, 연장근무와_야간근무가_포함된_근무_생성_요청;
+    static Attendance 추가_근무가_없는_근무, 연장근무가_포함된_근무, 야간근무가_포함된_근무, 연장근무와_야간근무가_포함된_근무;
+    static AttendanceRequest 추가_근무가_없는_근무_생성_요청, 연장근무가_포함된_근무_생성_요청, 야간근무가_포함된_근무_생성_요청, 연장근무와_야간근무가_포함된_근무_생성_요청;
 
     @BeforeAll
     static void setUp() {
-        일반_근무 = AttendanceFixtureGenerator.일반_근무();
+        추가_근무가_없는_근무 = AttendanceFixtureGenerator.추가_근무가_없는_근무();
         연장근무가_포함된_근무 = AttendanceFixtureGenerator.연장근무가_포함된_근무();
         야간근무가_포함된_근무 = AttendanceFixtureGenerator.야간근무가_포함된_근무();
         연장근무와_야간근무가_포함된_근무 = AttendanceFixtureGenerator.연장근무와_야간근무가_포함된_근무();
 
-        일반_근무_생성_요청 = AttendanceDto.AttendanceRequest.of(일반_근무.getStartAt(), 일반_근무.getEndAt());
+        추가_근무가_없는_근무_생성_요청 = AttendanceDto.AttendanceRequest.of(추가_근무가_없는_근무.getStartAt(), 추가_근무가_없는_근무.getEndAt());
         연장근무가_포함된_근무_생성_요청 = AttendanceDto.AttendanceRequest.of(연장근무가_포함된_근무.getStartAt(), 연장근무가_포함된_근무.getEndAt());
         야간근무가_포함된_근무_생성_요청 = AttendanceDto.AttendanceRequest.of(야간근무가_포함된_근무.getStartAt(), 야간근무가_포함된_근무.getEndAt());
         연장근무와_야간근무가_포함된_근무_생성_요청 = AttendanceDto.AttendanceRequest.of(연장근무와_야간근무가_포함된_근무.getStartAt(), 연장근무와_야간근무가_포함된_근무.getEndAt());
@@ -68,7 +68,7 @@ public class AttendanceServiceTest {
 
     private static Stream<Arguments> saveAttendance() {
         return Stream.of(
-            Arguments.of("일반_근무_생성_요청", 일반_근무, 일반_근무_생성_요청),
+            Arguments.of("추가_근무가_없는_근무_생성_요청", 추가_근무가_없는_근무, 추가_근무가_없는_근무_생성_요청),
             Arguments.of("연장근무가_포함된_근무_생성_요청", 연장근무가_포함된_근무, 연장근무가_포함된_근무_생성_요청),
             Arguments.of("야간근무가_포함된_근무_생성_요청", 야간근무가_포함된_근무, 야간근무가_포함된_근무_생성_요청),
             Arguments.of("연장근무와_야간근무가_포함된_근무_생성_요청", 연장근무와_야간근무가_포함된_근무, 연장근무와_야간근무가_포함된_근무_생성_요청)

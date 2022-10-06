@@ -4,15 +4,24 @@ import static org.hibernate.type.IntegerType.ZERO;
 
 import io.sample.attendance.domain.Attendance;
 import io.sample.attendance.dto.AttendanceDto.AttendanceRequest;
+import io.sample.attendance.repo.AttendanceRepo;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import org.springframework.boot.test.context.TestComponent;
 
+@TestComponent
 public class AttendanceFixtureGenerator {
     private static final LocalDate today = LocalDate.now();
     private static final LocalDate nextDay = today.plusDays(1);
 
-    public static Attendance 일반_근무() {
+    private final AttendanceRepo attendanceRepo;
+
+    public AttendanceFixtureGenerator(AttendanceRepo attendanceRepo) {
+        this.attendanceRepo = attendanceRepo;
+    }
+
+    public static Attendance 추가_근무가_없는_근무() {
         final LocalDateTime startAt = LocalDateTime.of(today, LocalTime.of(9, ZERO));
         final LocalDateTime endAt = LocalDateTime.of(today, LocalTime.of(18, ZERO));
         return Attendance.of(startAt, endAt);
@@ -36,9 +45,9 @@ public class AttendanceFixtureGenerator {
         return Attendance.of(startAt, endAt);
     }
 
-    public static AttendanceRequest 일반_근무_생성_요청() {
-        Attendance 일반_근무 = 일반_근무();
-        return AttendanceRequest.of(일반_근무.getStartAt(), 일반_근무.getEndAt());
+    public static AttendanceRequest 추가_근무가_없는_근무_생성_요청() {
+        Attendance 추가_근무가_없는_근무 = 추가_근무가_없는_근무();
+        return AttendanceRequest.of(추가_근무가_없는_근무.getStartAt(), 추가_근무가_없는_근무.getEndAt());
     }
 
     public static AttendanceRequest 연장근무가_포함된_근무_생성_요청() {
@@ -54,5 +63,25 @@ public class AttendanceFixtureGenerator {
     public static AttendanceRequest 연장근무와_야간근무가_포함된_근무_생성_요청() {
         Attendance 연장근무와_야간근무가_포함된_근무 = 연장근무와_야간근무가_포함된_근무();
         return AttendanceRequest.of(연장근무와_야간근무가_포함된_근무.getStartAt(), 연장근무와_야간근무가_포함된_근무.getEndAt());
+    }
+
+    public Attendance 추가_근무가_없는_근무_등록() {
+        return 근무_저장(추가_근무가_없는_근무());
+    }
+
+    public Attendance 연장근무가_포함된_근무_등록() {
+        return 근무_저장(연장근무가_포함된_근무());
+    }
+
+    public Attendance 야간근무가_포함된_근무_등록() {
+        return 근무_저장(야간근무가_포함된_근무());
+    }
+
+    public Attendance 연장근무와_야간근무가_포함된_근무_등록() {
+        return 근무_저장(연장근무와_야간근무가_포함된_근무());
+    }
+
+    private Attendance 근무_저장(Attendance attendance) {
+        return attendanceRepo.saveAndFlush(attendance);
     }
 }

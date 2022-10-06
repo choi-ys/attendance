@@ -1,5 +1,6 @@
 package io.sample.attendance.application;
 
+import io.sample.attendance.domain.Attendance;
 import io.sample.attendance.dto.AttendanceDto.AttendanceRequest;
 import io.sample.attendance.dto.AttendanceDto.AttendanceResponse;
 import io.sample.attendance.repo.AttendanceRepo;
@@ -16,5 +17,13 @@ public class AttendanceService {
     @Transactional
     public AttendanceResponse saveAttendance(AttendanceRequest attendanceRequest) {
         return AttendanceResponse.toResponse(attendanceRepo.save(attendanceRequest.toEntity()));
+    }
+
+    public AttendanceResponse findAttendanceResponseById(Long id) {
+        return AttendanceResponse.toResponse(findAttendanceById(id));
+    }
+
+    private Attendance findAttendanceById(Long id) {
+        return attendanceRepo.findById(id).orElseThrow(() -> new IllegalArgumentException(""));
     }
 }
