@@ -3,6 +3,8 @@ package io.sample.attendance.application;
 import io.sample.attendance.domain.Attendance;
 import io.sample.attendance.dto.AttendanceDto.AttendanceRequest;
 import io.sample.attendance.dto.AttendanceDto.AttendanceResponse;
+import io.sample.attendance.global.exception.ResourceNotFoundException;
+import io.sample.attendance.global.response.ErrorCode;
 import io.sample.attendance.repo.AttendanceRepo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -24,6 +26,6 @@ public class AttendanceService {
     }
 
     private Attendance findAttendanceById(Long id) {
-        return attendanceRepo.findById(id).orElseThrow(() -> new IllegalArgumentException(""));
+        return attendanceRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException(ErrorCode.RESOURCE_NOT_FOUND, id));
     }
 }

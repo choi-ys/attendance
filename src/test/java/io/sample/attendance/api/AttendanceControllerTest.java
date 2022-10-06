@@ -10,6 +10,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import io.sample.attendance.config.SpringBootBaseTest;
 import io.sample.attendance.dto.AttendanceDto.AttendanceRequest;
+import java.time.LocalDateTime;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
@@ -26,6 +27,20 @@ class AttendanceControllerTest extends SpringBootBaseTest {
         // Then
         근무_기록_등록_응답_검증(근무_기록_등록_응답);
         추가_근무가_없는_근무_기록_응답_항목_검증(근무_기록_등록_응답);
+    }
+
+    @Test
+    @DisplayName("[400:POST]올바르지 않은 근태 기록 등록")
+    public void throwException_WhenInvalidAttendanceRequest() throws Exception {
+        // Given
+        final LocalDateTime now = LocalDateTime.now();
+        AttendanceRequest 출근시간과_퇴근시간이_같은_근무_생성_요청 = AttendanceRequest.of(now, now);
+
+        // When
+        ResultActions 근무_기록_등록_응답 = 근무_기록_등록_요청(출근시간과_퇴근시간이_같은_근무_생성_요청);
+
+        // Then
+        근무_기록_등록_응답.andExpect(status().isBadRequest());
     }
 
     @Test
