@@ -7,46 +7,55 @@ import javax.servlet.http.HttpServletRequest;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ErrorResponse {
-    private String code;
-    private String message;
+    private LocalDateTime timestamp = LocalDateTime.now();
     private String method;
     private String path;
+    private String code;
+    private String message;
     private List<ErrorDetail> errorDetails;
-    private LocalDateTime timestamp = LocalDateTime.now();
 
-    private ErrorResponse(ErrorCode errorCode, HttpServletRequest httpServletRequest) {
-        this.code = errorCode.name();
-        this.message = errorCode.getMessage();
-        this.method = httpServletRequest.getMethod();
-        this.path = httpServletRequest.getRequestURI();
+    private ErrorResponse(String method, String path, String code, String message) {
+        this.method = method;
+        this.path = path;
+        this.code = code;
+        this.message = message;
     }
 
-    private ErrorResponse(ErrorCode errorCode, HttpServletRequest httpServletRequest, List<ErrorDetail> errorDetails) {
-        this(errorCode, httpServletRequest);
+    private ErrorResponse(String method, String path, String code, String message, List<ErrorDetail> errorDetails) {
+        this(method, path, code, message);
         this.errorDetails = errorDetails;
     }
 
-    private ErrorResponse(BusinessException businessException, HttpServletRequest httpServletRequest) {
-        this.code = businessException.getErrorCodeName();
-        this.message = businessException.getMessage();
-        this.method = httpServletRequest.getMethod();
-        this.path = httpServletRequest.getRequestURI();
+    public static ErrorResponse businessErrorOf(BusinessException exception, HttpServletRequest request) {
+        return new ErrorResponse(
+            request.getMethod(),
+            request.getRequestURI(),
+            exception.getMessage(),
+            exception.getErrorCodeName()
+        );
     }
 
-    public static ErrorResponse of(ErrorCode errorCode, HttpServletRequest httpServletRequest) {
-        return new ErrorResponse(errorCode, httpServletRequest);
+    public static ErrorResponse errorResponseOf(ErrorCode errorCode, HttpServletRequest request) {
+        return new ErrorResponse(
+            request.getMethod(),
+            request.getRequestURI(),
+            errorCode.message,
+            errorCode.name()
+        );
     }
 
-    public static ErrorResponse of(ErrorCode errorCode, HttpServletRequest httpServletRequest, List<FieldError> fieldErrors) {
-        return new ErrorResponse(errorCode, httpServletRequest, ErrorDetail.from(fieldErrors));
-    }
-
-    public static ErrorResponse of(BusinessException businessException, HttpServletRequest httpServletRequest) {
-        return new ErrorResponse(businessException, httpServletRequest);
+    public static ErrorResponse errorResponseWithFieldErrorsOf(MethodArgumentNotValidException exception, ErrorCode errorCode, HttpServletRequest request) {
+        return new ErrorResponse(
+            request.getMethod(),
+            request.getRequestURI(),
+            errorCode.message,
+            errorCode.name(),
+            ErrorDetail.from(exception.getFieldErrors())
+        );
     }
 }

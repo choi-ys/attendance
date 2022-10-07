@@ -29,7 +29,7 @@ public class ExceptionAdvice {
         applicationEventPublisher.publishEvent(ThrowsException.of(exception, request));
         return ResponseEntity
             .status(exception.getHttpStatus())
-            .body(ErrorResponse.of(exception, request));
+            .body(ErrorResponse.businessErrorOf(exception, request));
     }
 
     @ExceptionHandler(Exception.class)
@@ -37,7 +37,7 @@ public class ExceptionAdvice {
         ErrorCode errorCode = ErrorCode.UNEXPECTED_ERROR;
         return ResponseEntity
             .status(errorCode.httpStatus)
-            .body(ErrorResponse.of(errorCode, request));
+            .body(ErrorResponse.errorResponseOf(errorCode, request));
     }
 
     @ExceptionHandler({
@@ -53,7 +53,7 @@ public class ExceptionAdvice {
         ErrorCode errorCode = ErrorCode.valueOf(exception);
         return ResponseEntity
             .status(errorCode.httpStatus)
-            .body(ErrorResponse.of(errorCode, request));
+            .body(ErrorResponse.errorResponseOf(errorCode, request));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -61,6 +61,6 @@ public class ExceptionAdvice {
         ErrorCode errorCode = ErrorCode.valueOf(exception);
         return ResponseEntity
             .status(errorCode.httpStatus)
-            .body(ErrorResponse.of(errorCode, request, exception.getFieldErrors()));
+            .body(ErrorResponse.errorResponseWithFieldErrorsOf(exception, errorCode, request));
     }
 }

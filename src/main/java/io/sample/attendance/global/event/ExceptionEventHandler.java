@@ -10,8 +10,6 @@ import org.springframework.stereotype.Component;
 @Component
 @Slf4j
 public class ExceptionEventHandler {
-    final int MAXIMUM_ABBREVIATED_STACK_TRACE_COUNT = 5;
-
     @EventListener
     @Async
     public void onExceptionEventListener(ThrowsException throwsException) {
@@ -20,22 +18,7 @@ public class ExceptionEventHandler {
         log.error("[method : {}, uri : {}]\n[code :{}, message : {}]\n[trace : {}]",
             request.getMethod(), request.getRequestURI(),
             exception.getErrorCodeName(), exception.getMessage(),
-            getAbbreviatedExceptionStaceTrace(exception.getStackTrace())
+            throwsException.getAbbreviatedExceptionStaceTrace()
         );
-    }
-
-    private String getAbbreviatedExceptionStaceTrace(StackTraceElement[] stackTraceElements) {
-        StringBuilder stringBuilder = new StringBuilder();
-        for (int i = 0; i < MAXIMUM_ABBREVIATED_STACK_TRACE_COUNT; i++) {
-            stringBuilder.append(stackTraceElements[i]);
-            if (isLastElement(i)) {
-                stringBuilder.append("\n");
-            }
-        }
-        return stringBuilder.toString();
-    }
-
-    private boolean isLastElement(int index) {
-        return index != MAXIMUM_ABBREVIATED_STACK_TRACE_COUNT - 1;
     }
 }
