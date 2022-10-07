@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
+import io.sample.attendance.global.exception.InValidTimeException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -25,7 +26,7 @@ class TimeTableTest {
         final LocalDateTime endAt
     ) {
         // When & Then
-        assertThatExceptionOfType(IllegalArgumentException.class)
+        assertThatExceptionOfType(InValidTimeException.class)
             .as(description)
             .isThrownBy(() -> TimeTable.of(startAt, endAt));
     }

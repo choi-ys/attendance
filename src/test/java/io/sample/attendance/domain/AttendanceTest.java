@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.hibernate.type.IntegerType.ZERO;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
+import io.sample.attendance.global.exception.InValidTimeException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -30,7 +31,7 @@ class AttendanceTest {
         final LocalDateTime endAt
     ) {
         // When & Then
-        assertThatExceptionOfType(IllegalArgumentException.class)
+        assertThatExceptionOfType(InValidTimeException.class)
             .as(description)
             .isThrownBy(() -> Attendance.of(startAt, endAt));
     }
@@ -184,11 +185,15 @@ class AttendanceTest {
                 ExtraWork firstSectionOfNightShift = nightShifts.get(0);
                 ExtraWork secondSectionOfNightShift = nightShifts.get(1);
                 assertThat(nightShifts).size().isEqualTo(2);
-                assertThat(firstSectionOfNightShift.getTimeTable().getStartAt()).as("첫번째 야간 근무 구간 시작 시간").isEqualTo(LocalDateTime.of(today, LocalTime.of(5, 30)));
-                assertThat(firstSectionOfNightShift.getTimeTable().getEndAt()).as("첫번째 야간 근무 종료 시간").isEqualTo(LocalDateTime.of(today, LocalTime.of(6, 0)));
+                assertThat(firstSectionOfNightShift.getTimeTable().getStartAt()).as("첫번째 야간 근무 구간 시작 시간")
+                    .isEqualTo(LocalDateTime.of(today, LocalTime.of(5, 30)));
+                assertThat(firstSectionOfNightShift.getTimeTable().getEndAt()).as("첫번째 야간 근무 종료 시간")
+                    .isEqualTo(LocalDateTime.of(today, LocalTime.of(6, 0)));
                 assertThat(firstSectionOfNightShift.getPay()).as("첫번째 야간 근무 종료 수당").isEqualTo(4500);
-                assertThat(secondSectionOfNightShift.getTimeTable().getStartAt()).as("두번째 야간 근로 시작 시간").isEqualTo(LocalDateTime.of(today, LocalTime.of(22, 0)));
-                assertThat(secondSectionOfNightShift.getTimeTable().getEndAt()).as("두번째 야간 근로 종료 시간").isEqualTo(LocalDateTime.of(nextDay, LocalTime.of(6, 0)));
+                assertThat(secondSectionOfNightShift.getTimeTable().getStartAt()).as("두번째 야간 근로 시작 시간")
+                    .isEqualTo(LocalDateTime.of(today, LocalTime.of(22, 0)));
+                assertThat(secondSectionOfNightShift.getTimeTable().getEndAt()).as("두번째 야간 근로 종료 시간")
+                    .isEqualTo(LocalDateTime.of(nextDay, LocalTime.of(6, 0)));
                 assertThat(secondSectionOfNightShift.getPay()).as("두번째 야간 근무 수당").isEqualTo(72000);
             }
         );

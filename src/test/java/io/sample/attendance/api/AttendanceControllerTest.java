@@ -40,7 +40,9 @@ class AttendanceControllerTest extends SpringBootBaseTest {
         ResultActions 근무_기록_등록_응답 = 근무_기록_등록_요청(출근시간과_퇴근시간이_같은_근무_생성_요청);
 
         // Then
-        근무_기록_등록_응답.andExpect(status().isBadRequest());
+        근무_기록_등록_응답
+            .andDo(print())
+            .andExpect(status().isBadRequest());
     }
 
     @Test
