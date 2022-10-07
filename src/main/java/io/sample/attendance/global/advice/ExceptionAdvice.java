@@ -27,9 +27,8 @@ public class ExceptionAdvice {
     @ExceptionHandler(BusinessException.class)
     public ResponseEntity<ErrorResponse> businessException(BusinessException exception, HttpServletRequest request) {
         applicationEventPublisher.publishEvent(ThrowsException.of(exception, request));
-        ErrorCode errorCode = exception.getErrorCode();
         return ResponseEntity
-            .status(errorCode.httpStatus)
+            .status(exception.getHttpStatus())
             .body(ErrorResponse.of(exception, request));
     }
 
