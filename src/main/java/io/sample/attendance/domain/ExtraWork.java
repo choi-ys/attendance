@@ -1,5 +1,6 @@
 package io.sample.attendance.domain;
 
+import io.sample.attendance.global.auditor.BaseEntity;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import javax.persistence.Embedded;
@@ -19,7 +20,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ExtraWork {
+public class ExtraWork extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

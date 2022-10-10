@@ -2,6 +2,7 @@ package io.sample.attendance.domain;
 
 import static io.sample.attendance.validator.TimeValidator.validateStartAndEndTime;
 
+import io.sample.attendance.global.auditor.BaseEntity;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import javax.persistence.Embedded;
@@ -16,7 +17,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Attendance {
+public class Attendance extends BaseEntity {
     public static final int DAILY_STATUTORY_ACTUAL_WORKING_HOUR = 8;
     public static final int MAX_BREAK_TIME_HOUR = 1;
     public static final int DAILY_STATUTORY_WORKING_HOUR = DAILY_STATUTORY_ACTUAL_WORKING_HOUR + MAX_BREAK_TIME_HOUR;

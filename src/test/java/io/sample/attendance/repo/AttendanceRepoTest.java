@@ -60,6 +60,8 @@ class AttendanceRepoTest {
 
         // Then
         assertThat(actual).isSameAs(given);
+        assertThat(actual.getCreatedAt()).isNotNull();
+        assertThat(actual.getUpdatedAt()).isNotNull();
     }
 
     @Test
