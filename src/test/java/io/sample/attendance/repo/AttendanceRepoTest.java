@@ -1,9 +1,13 @@
 package io.sample.attendance.repo;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
+import com.github.gavlyukovskiy.boot.jdbc.decorator.DataSourceDecoratorAutoConfiguration;
+import io.sample.attendance.config.p6spy.P6spyLogMessageFormatConfiguration;
 import io.sample.attendance.domain.Attendance;
 import io.sample.attendance.domain.ExtraWorkType;
+import io.sample.attendance.fixture.AttendanceFixtureGenerator;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -11,20 +15,33 @@ import javax.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.test.context.TestConstructor;
 import org.springframework.test.context.TestConstructor.AutowireMode;
 
-@DataJpaTest
+@DataJpaTest(showSql = false)
 @TestConstructor(autowireMode = AutowireMode.ALL)
+@ImportAutoConfiguration(DataSourceDecoratorAutoConfiguration.class)
+@Import({AttendanceFixtureGenerator.class, P6spyLogMessageFormatConfiguration.class})
 @DisplayName("Repo:Attendance")
 class AttendanceRepoTest {
     private final AttendanceRepo attendanceRepo;
     private final EntityManager entityManager;
+    private final AttendanceFixtureGenerator attendanceFixtureGenerator;
 
-    public AttendanceRepoTest(AttendanceRepo attendanceRepo, EntityManager entityManager) {
+    public AttendanceRepoTest(
+        AttendanceRepo attendanceRepo,
+        EntityManager entityManager,
+        AttendanceFixtureGenerator attendanceFixtureGenerator
+    ) {
         this.attendanceRepo = attendanceRepo;
         this.entityManager = entityManager;
+        this.attendanceFixtureGenerator = attendanceFixtureGenerator;
     }
 
     private Attendance given;
@@ -113,5 +130,36 @@ class AttendanceRepoTest {
                 assertThat(extraWorks.getExtraWorkTypes()).containsOnly(ExtraWorkType.NIGHT_SHIFT, ExtraWorkType.OVERTIME);
                 assertThat(extraWorks.getSize()).isEqualTo(3);
             });
+    }
+
+    @Test
+    @DisplayName("월별 근태 목록 조회")
+    public void findByAttendanceAndExtraWorksPageByCreatedAt() {
+        // Given
+        final int requestSize = 5;
+        attendanceFixtureGenerator.근무_목록_생성(requestSize);
+        entityManager.clear();
+
+        final LocalDate createdAt = LocalDate.now();
+        final int requestPage = 0;
+        final int perPageNum = 10;
+        final String sortProperties = "createdAt";
+        final Sort orderBy = Sort.by(Sort.Direction.DESC, sortProperties);
+        final PageRequest pageRequest = PageRequest.of(requestPage, perPageNum, orderBy);
+
+        // When
+        Page<Attendance> actual = attendanceRepo.findAttendanceWithExtraWorksPageList(createdAt, pageRequest);
+
+        // Then
+        assertAll(
+            () -> assertThat(actual.getTotalPages()).as("전체 페이지 수").isEqualTo(1),
+            () -> assertThat(actual.getContent()).as("조회된 페이지의 컨텐츠 수").hasSize(requestSize),
+            () -> assertThat(actual.getPageable())
+                .satisfies(pageable -> {
+                    assertThat(pageable.getPageNumber()).as("현재 페이지 번호").isEqualTo(requestPage);
+                    assertThat(pageable.getPageSize()).as("페이지당 컨텐츠 수").isEqualTo(perPageNum);
+                    assertThat(pageable.getSort()).as("정렬 기준").isEqualTo(orderBy);
+                })
+        );
     }
 }

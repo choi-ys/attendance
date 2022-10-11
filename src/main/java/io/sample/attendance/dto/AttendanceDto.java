@@ -60,7 +60,7 @@ public class AttendanceDto {
             this.extraWorks = extraWorks;
         }
 
-        public static AttendanceResponse toResponse(Attendance attendance) {
+        public static AttendanceResponse of(Attendance attendance) {
             return new AttendanceResponse(
                 attendance.getId(),
                 attendance.getStartAt(),
@@ -68,11 +68,11 @@ public class AttendanceDto {
                 attendance.getWorkDuration(),
                 attendance.getBasicPay(),
                 attendance.getTotalPay(),
-                toResponse(attendance.getExtraWorks())
+                of(attendance.getExtraWorks())
             );
         }
 
-        private static List<ExtraWorkResponse> toResponse(ExtraWorks extraWorks) {
+        private static List<ExtraWorkResponse> of(ExtraWorks extraWorks) {
             return extraWorks
                 .getElements()
                 .stream()

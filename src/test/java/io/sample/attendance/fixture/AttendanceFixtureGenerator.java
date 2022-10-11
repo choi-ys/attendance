@@ -81,6 +81,26 @@ public class AttendanceFixtureGenerator {
         return 근무_저장(연장근무와_야간근무가_포함된_근무());
     }
 
+    public void 근무_목록_생성(int size) {
+        for (int i = 0; i < size; i++) {
+            int remainder = i % 4;
+            switch (remainder) {
+                case 0:
+                    추가_근무가_없는_근무_등록();
+                    break;
+                case 1:
+                    연장근무가_포함된_근무_등록();
+                    break;
+                case 2:
+                    야간근무가_포함된_근무_등록();
+                    break;
+                case 3:
+                    연장근무와_야간근무가_포함된_근무_등록();
+                    break;
+            }
+        }
+    }
+
     private Attendance 근무_저장(Attendance attendance) {
         return attendanceRepo.saveAndFlush(attendance);
     }
