@@ -11,22 +11,9 @@ spring:
       max-lifetime: 58000
 
   jpa:
-    properties:
-      hibernate:
-        format_sql: true
-
     hibernate:
       ddl-auto: create-drop
-    show_sql: true
 
   h2:
     console:
       enabled: true
-
-logging:
-  level:
-    org:
-      hibernate:
-        type:
-          descriptor:
-            sql: trace
