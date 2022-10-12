@@ -3,12 +3,15 @@ package io.sample.attendance.dto;
 import io.sample.attendance.domain.Attendance;
 import io.sample.attendance.domain.ExtraWorks;
 import io.sample.attendance.domain.WorkDuration;
+import io.sample.attendance.utils.PageableUtils;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.domain.Pageable;
 
 public class AttendanceDto {
     @Getter
@@ -78,6 +81,22 @@ public class AttendanceDto {
                 .stream()
                 .map(ExtraWorkResponse::from)
                 .collect(Collectors.toList());
+        }
+    }
+
+    @Getter
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    public static class MonthlyAttendanceRequest {
+        private LocalDate startAt;
+        private Pageable pageable;
+
+        private MonthlyAttendanceRequest(LocalDate startAt, Pageable pageable) {
+            this.startAt = startAt;
+            this.pageable = pageable;
+        }
+
+        public static MonthlyAttendanceRequest of(LocalDate startAt, Pageable pageable) {
+            return new MonthlyAttendanceRequest(startAt, PageableUtils.pageNumberToIndex(pageable));
         }
     }
 }

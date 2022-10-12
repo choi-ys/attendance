@@ -148,7 +148,7 @@ class AttendanceRepoTest {
         final PageRequest pageRequest = PageRequest.of(requestPage, perPageNum, orderBy);
 
         // When
-        Page<Attendance> actual = attendanceRepo.findAttendanceWithExtraWorksPageList(createdAt, pageRequest);
+        Page<Attendance> actual = attendanceRepo.findAttendanceWithExtraWorksPageByMonthly(createdAt, pageRequest);
 
         // Then
         assertAll(

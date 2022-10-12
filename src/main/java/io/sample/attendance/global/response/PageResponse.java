@@ -1,9 +1,12 @@
 package io.sample.attendance.global.response;
 
 import java.util.List;
+import lombok.Getter;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
 
-public class PageResponse {
+@Getter
+public class PageResponse<E> {
     private Integer totalPages;
     private Long totalElementCount;
     private Integer currentPage;
@@ -14,8 +17,9 @@ public class PageResponse {
     private Boolean lastPage;
     private Boolean hasNextPage;
     private Boolean hasPrevious;
+    private Sort sort;
 
-    private List<?> elements;
+    private List<E> elements;
 
     private PageResponse(
         Integer totalPages,
@@ -27,7 +31,8 @@ public class PageResponse {
         Boolean lastPage,
         Boolean hasNextPage,
         Boolean hasPrevious,
-        List<?> elements
+        Sort sort,
+        List<E> elements
     ) {
         this.totalPages = totalPages;
         this.totalElementCount = totalElementCount;
@@ -38,19 +43,20 @@ public class PageResponse {
         this.lastPage = lastPage;
         this.hasNextPage = hasNextPage;
         this.hasPrevious = hasPrevious;
+        this.sort = sort;
         this.elements = elements;
     }
 
-    public static PageResponse of(Page<?> page) {
+    public static <T> PageResponse<T> of(Page<T> page) {
         return getPageResponse(page, page.getContent());
     }
 
-    public static PageResponse of(Page<?> page, List<?> elements) {
+    public static <T, E> PageResponse<E> of(Page<T> page, List<E> elements) {
         return getPageResponse(page, elements);
     }
 
-    private static PageResponse getPageResponse(Page<?> page, List<?> elements) {
-        return new PageResponse(
+    private static <T, E> PageResponse<E> getPageResponse(Page<T> page, List<E> elements) {
+        return new PageResponse<>(
             page.getTotalPages(),
             page.getTotalElements(),
             indexToNumber(page),
@@ -60,6 +66,7 @@ public class PageResponse {
             page.isLast(),
             page.hasNext(),
             page.hasPrevious(),
+            page.getSort(),
             elements
         );
     }

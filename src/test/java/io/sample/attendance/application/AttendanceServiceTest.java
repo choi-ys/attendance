@@ -10,11 +10,17 @@ import io.sample.attendance.domain.ExtraWorkType;
 import io.sample.attendance.dto.AttendanceDto;
 import io.sample.attendance.dto.AttendanceDto.AttendanceRequest;
 import io.sample.attendance.dto.AttendanceDto.AttendanceResponse;
+import io.sample.attendance.dto.AttendanceDto.MonthlyAttendanceRequest;
 import io.sample.attendance.dto.ExtraWorkResponse;
 import io.sample.attendance.fixture.AttendanceFixtureGenerator;
+import io.sample.attendance.global.response.PageResponse;
 import io.sample.attendance.repo.AttendanceRepo;
+import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
@@ -27,6 +33,11 @@ import org.mockito.AdditionalAnswers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("Service:Attendance")
@@ -36,7 +47,6 @@ public class AttendanceServiceTest {
 
     @InjectMocks
     private AttendanceService attendanceService;
-
     static Attendance 추가_근무가_없는_근무, 연장근무가_포함된_근무, 야간근무가_포함된_근무, 연장근무와_야간근무가_포함된_근무;
     static AttendanceRequest 추가_근무가_없는_근무_생성_요청, 연장근무가_포함된_근무_생성_요청, 야간근무가_포함된_근무_생성_요청, 연장근무와_야간근무가_포함된_근무_생성_요청;
 
@@ -95,6 +105,24 @@ public class AttendanceServiceTest {
         verify(attendanceRepo).findById(연장근무가_포함된_근무.getId());
     }
 
+    @Test
+    @DisplayName("특정월의 근태 목록 조회")
+    public void findMonthlyAttendanceResponsesById() {
+        // Given
+        final LocalDate 조회월 = LocalDate.now();
+        final List<Attendance> 특정월의_근태_목록 = Arrays.asList(추가_근무가_없는_근무, 연장근무가_포함된_근무, 야간근무가_포함된_근무, 연장근무와_야간근무가_포함된_근무);
+        final MonthlyAttendanceRequest 특정월의_근태_목록_조회_요청 = 특정월의_근태_목록_조회_요청_생성(조회월);
+        final Pageable 조회_페이지_정보 = 특정월의_근태_목록_조회_요청.getPageable();
+        특정월의_근태_목록_조회_제어(조회월, 조회_페이지_정보, 특정월의_근태_목록);
+
+        // When
+        PageResponse<AttendanceResponse> 특정월의_근태_목록_조회_응답 = attendanceService.findAttendanceResponsesByMonthly(특정월의_근태_목록_조회_요청);
+
+        // Then
+        특정월의_근태_목록_응답_검증(특정월의_근태_목록, 특정월의_근태_목록_조회_응답);
+        verify(attendanceRepo).findAttendanceWithExtraWorksPageByMonthly(조회월, 조회_페이지_정보);
+    }
+
     private void 근무_생성_제어(Attendance attendance) {
         given(attendanceRepo.save(attendance)).will(AdditionalAnswers.returnsFirstArg());
     }
@@ -114,6 +142,39 @@ public class AttendanceServiceTest {
             () -> assertThat(근무_응답.getExtraWorks())
                 .extracting(ExtraWorkResponse::getExtraWorkType)
                 .containsAnyElementsOf(추가_근무_타입)
+        );
+    }
+
+    private void 특정월의_근태_목록_조회_제어(LocalDate 조회월, Pageable 조회_페이지_정보, List<Attendance> 특정_월의_근태_목록) {
+        PageImpl<Attendance> pageResponse = new PageImpl<>(특정_월의_근태_목록, 조회_페이지_정보, 특정_월의_근태_목록.size());
+        given(attendanceRepo.findAttendanceWithExtraWorksPageByMonthly(조회월, 조회_페이지_정보)).willReturn(pageResponse);
+    }
+
+    private MonthlyAttendanceRequest 특정월의_근태_목록_조회_요청_생성(LocalDate yearMonth) {
+        final int requestPage = 0;
+        final int perPageNum = 10;
+        final String sortingProperties = "startAt";
+        final Sort sort = Sort.by(Direction.DESC, sortingProperties);
+        return MonthlyAttendanceRequest.of(yearMonth, PageRequest.of(requestPage, perPageNum, sort));
+    }
+
+    private void 특정월의_근태_목록_응답_검증(List<Attendance> attendances, PageResponse<AttendanceResponse> 특정월의_근태_목록_응답) {
+        List<Long> collect = attendances.stream()
+            .map(Attendance::getId)
+            .collect(Collectors.toList());
+
+        List<AttendanceResponse> elements = 특정월의_근태_목록_응답.getElements();
+        List<Long> attendanceResponseIds = elements.stream()
+            .map(AttendanceResponse::getId)
+            .collect(Collectors.toList());
+
+        assertAll(
+            () -> assertThat(특정월의_근태_목록_응답.getTotalPages()).as("전체 페이지 수").isEqualTo(1),
+            () -> assertThat(특정월의_근태_목록_응답.getCurrentElementCount()).as("조회된 페이지의 컨텐츠 수").isEqualTo(attendances.size()),
+            () -> assertThat(특정월의_근태_목록_응답.getCurrentPage()).as("현재 페이지 번호").isEqualTo(1),
+            () -> assertThat(특정월의_근태_목록_응답.getPerPageNumber()).as("페이지당 컨텐츠 수").isEqualTo(10),
+            () -> assertThat(특정월의_근태_목록_응답.getSort()).as("정렬 기준").isEqualTo(Sort.by(Direction.DESC, "startAt")),
+            () -> assertThat(attendanceResponseIds).containsExactlyElementsOf(collect)
         );
     }
 }
