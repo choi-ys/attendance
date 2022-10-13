@@ -4,8 +4,8 @@ import io.sample.attendance.domain.Attendance;
 import io.sample.attendance.domain.ExtraWorks;
 import io.sample.attendance.domain.WorkDuration;
 import io.sample.attendance.utils.PageableUtils;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.YearMonth;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.AccessLevel;
@@ -87,15 +87,15 @@ public class AttendanceDto {
     @Getter
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static class MonthlyAttendanceRequest {
-        private LocalDate startAt;
+        private YearMonth startAt;
         private Pageable pageable;
 
-        private MonthlyAttendanceRequest(LocalDate startAt, Pageable pageable) {
+        private MonthlyAttendanceRequest(YearMonth startAt, Pageable pageable) {
             this.startAt = startAt;
             this.pageable = pageable;
         }
 
-        public static MonthlyAttendanceRequest of(LocalDate startAt, Pageable pageable) {
+        public static MonthlyAttendanceRequest of(YearMonth startAt, Pageable pageable) {
             return new MonthlyAttendanceRequest(startAt, PageableUtils.pageNumberToIndex(pageable));
         }
     }

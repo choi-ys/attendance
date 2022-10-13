@@ -1,11 +1,13 @@
 package io.sample.attendance.global.response;
 
 import java.util.List;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Sort;
 
 @Getter
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class PageResponse<E> {
     private Integer totalPages;
     private Long totalElementCount;
@@ -17,7 +19,6 @@ public class PageResponse<E> {
     private Boolean lastPage;
     private Boolean hasNextPage;
     private Boolean hasPrevious;
-    private Sort sort;
 
     private List<E> elements;
 
@@ -31,7 +32,6 @@ public class PageResponse<E> {
         Boolean lastPage,
         Boolean hasNextPage,
         Boolean hasPrevious,
-        Sort sort,
         List<E> elements
     ) {
         this.totalPages = totalPages;
@@ -43,11 +43,10 @@ public class PageResponse<E> {
         this.lastPage = lastPage;
         this.hasNextPage = hasNextPage;
         this.hasPrevious = hasPrevious;
-        this.sort = sort;
         this.elements = elements;
     }
 
-    public static <T> PageResponse<T> of(Page<T> page) {
+    public static <E> PageResponse<E> of(Page<E> page) {
         return getPageResponse(page, page.getContent());
     }
 
@@ -66,7 +65,6 @@ public class PageResponse<E> {
             page.isLast(),
             page.hasNext(),
             page.hasPrevious(),
-            page.getSort(),
             elements
         );
     }

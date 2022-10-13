@@ -11,6 +11,7 @@ import io.sample.attendance.fixture.AttendanceFixtureGenerator;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.YearMonth;
 import javax.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -140,7 +141,7 @@ class AttendanceRepoTest {
         attendanceFixtureGenerator.근무_목록_생성(requestSize);
         entityManager.clear();
 
-        final LocalDate createdAt = LocalDate.now();
+        final YearMonth yearMonth = YearMonth.from(LocalDate.now()) ;
         final int requestPage = 0;
         final int perPageNum = 10;
         final String sortProperties = "createdAt";
@@ -148,7 +149,7 @@ class AttendanceRepoTest {
         final PageRequest pageRequest = PageRequest.of(requestPage, perPageNum, orderBy);
 
         // When
-        Page<Attendance> actual = attendanceRepo.findAttendanceWithExtraWorksPageByMonthly(createdAt, pageRequest);
+        Page<Attendance> actual = attendanceRepo.findAttendanceWithExtraWorksPageByMonthly(yearMonth, pageRequest);
 
         // Then
         assertAll(

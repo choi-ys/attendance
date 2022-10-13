@@ -3,8 +3,15 @@ package io.sample.attendance.api;
 import io.sample.attendance.application.AttendanceService;
 import io.sample.attendance.dto.AttendanceDto.AttendanceRequest;
 import io.sample.attendance.dto.AttendanceDto.AttendanceResponse;
+import io.sample.attendance.dto.AttendanceDto.MonthlyAttendanceRequest;
+import io.sample.attendance.global.response.PageResponse;
 import java.net.URI;
+import java.time.YearMonth;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,6 +19,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -35,6 +43,14 @@ public class AttendanceController {
     @GetMapping("{id}")
     public ResponseEntity<AttendanceResponse> findAttendanceById(@PathVariable Long id) {
         return ResponseEntity.ok(attendanceService.findAttendanceResponseById(id));
+    }
+
+    @GetMapping("/monthly")
+    public ResponseEntity<PageResponse<AttendanceResponse>> findAttendancesMonthly(
+        @RequestParam @DateTimeFormat(pattern = "yyyy-MM") YearMonth yearMonth,
+        @PageableDefault(sort = {"createdAt"}, direction = Sort.Direction.DESC) Pageable pageable
+    ) {
+        return ResponseEntity.ok(attendanceService.findAttendanceResponsesByMonthly(MonthlyAttendanceRequest.of(yearMonth, pageable)));
     }
 
     private <T> URI uriFormatter(T path) {
