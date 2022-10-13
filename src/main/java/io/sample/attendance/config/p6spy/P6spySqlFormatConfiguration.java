@@ -38,14 +38,22 @@ public class P6spySqlFormatConfiguration implements MessageFormattingStrategy {
     }
 
     private String formatSql(String category, String sql) {
-        if (isStatementCategory(category)) {
-            String statement = sql.trim().toLowerCase();
-            if (isDataDefinitionLanguage(statement)) {
-                return toFormat(FormatStyle.DDL, sql);
-            }
-            return toFormat(FormatStyle.BASIC, sql);
+        if (isNotStatementCategory(category)) {
+            return sql;
         }
-        return sql;
+        String statement = sql.trim().toLowerCase();
+        return formatSqlByStatementCategory(statement, sql);
+    }
+
+    private String formatSqlByStatementCategory(String statement, String sql) {
+        if (isDataDefinitionLanguage(statement)) {
+            return toFormat(FormatStyle.DDL, sql);
+        }
+        return toFormat(FormatStyle.BASIC, sql);
+    }
+
+    private boolean isNotStatementCategory(String category) {
+        return !isStatementCategory(category);
     }
 
     private boolean isStatementCategory(String category) {
