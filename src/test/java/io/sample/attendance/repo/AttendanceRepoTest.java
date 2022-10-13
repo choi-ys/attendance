@@ -6,14 +6,11 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import com.github.gavlyukovskiy.boot.jdbc.decorator.DataSourceDecoratorAutoConfiguration;
 import io.sample.attendance.config.p6spy.P6spyLogMessageFormatConfiguration;
 import io.sample.attendance.domain.Attendance;
-import io.sample.attendance.domain.ExtraWorkType;
 import io.sample.attendance.fixture.AttendanceFixtureGenerator;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.YearMonth;
 import javax.persistence.EntityManager;
-import org.junit.jupiter.api.BeforeEach;
+import org.hibernate.Hibernate;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
@@ -45,92 +42,79 @@ class AttendanceRepoTest {
         this.attendanceFixtureGenerator = attendanceFixtureGenerator;
     }
 
-    private Attendance given;
-
-    @BeforeEach
-    void setUp() {
-        final LocalDate today = LocalDate.now();
-        final LocalDateTime startAt = LocalDateTime.of(today, LocalTime.of(9, 0));
-        final LocalDateTime endAt = LocalDateTime.of(today, LocalTime.of(18, 0));
-
-        given = Attendance.of(startAt, endAt);
-    }
-
     @Test
     @DisplayName("추가 근무가 없는 일일 근태 기록 저장")
     public void save() {
+        // Given
+        Attendance given = AttendanceFixtureGenerator.추가_근무가_없는_근무();
+
         // When
         Attendance actual = attendanceRepo.save(given);
 
         // Then
-        assertThat(actual).isSameAs(given);
+        assertAll(
+            () -> assertThat(actual).isSameAs(given),
+            () -> assertThat(actual.getCreatedAt()).isNotNull(),
+            () -> assertThat(actual.getUpdatedAt()).isNotNull()
+        );
     }
 
     @Test
     @DisplayName("추가 근무가 있는 일일 근태 기록 저장")
     public void save_existExtraWorks() {
         // When
-        final LocalDate today = LocalDate.now();
-        final LocalDateTime startAt = LocalDateTime.of(today, LocalTime.of(5, 0));
-        final LocalDateTime endAt = LocalDateTime.of(today, LocalTime.of(23, 0));
-        Attendance given = Attendance.of(startAt, endAt);
+        Attendance given = attendanceFixtureGenerator.연장근무와_야간근무가_포함된_근무_등록();
         Attendance actual = attendanceRepo.save(given);
 
         // Then
-        assertThat(actual).isSameAs(given);
-        assertThat(actual.getCreatedAt()).isNotNull();
-        assertThat(actual.getUpdatedAt()).isNotNull();
+        assertAll(
+            () -> assertThat(actual).isSameAs(given),
+            () -> assertThat(actual.getExtraWorks()).satisfies(extraWorks -> {
+                assertThat(extraWorks.getSize()).isEqualTo(given.getExtraWorks().getSize());
+                assertThat(extraWorks.getExtraWorkTypes()).containsExactlyElementsOf(given.getExtraWorks().getExtraWorkTypes());
+            })
+        );
     }
 
     @Test
-    @DisplayName("일일 근태 기록 조회")
+    @DisplayName("일일 근태 기록 조회 시 추가 근무와 함께 조회")
     public void findById() {
         // Given
-        attendanceRepo.saveAndFlush(given);
+        Attendance given = attendanceFixtureGenerator.연장근무와_야간근무가_포함된_근무_등록();
         entityManager.clear();
 
         // When
         Attendance actual = attendanceRepo.findById(given.getId()).orElseThrow();
 
         // Then
-        assertThat(actual).isEqualTo(given);
+        assertAll(
+            () -> assertThat(actual).isEqualTo(given),
+            () -> assertThat(Hibernate.isInitialized(actual.getExtraWorks().getElements()))
+                .as("@EntityGraph를 통해 LAZY로 설정된 연관객체의 즉시 조회 여부")
+                .isTrue(),
+            () -> assertThat(actual.getExtraWorks()).satisfies(extraWorks -> {
+                assertThat(extraWorks.getSize()).isEqualTo(given.getExtraWorks().getSize());
+                assertThat(extraWorks.getExtraWorkTypes()).containsExactlyElementsOf(given.getExtraWorks().getExtraWorkTypes());
+            })
+        );
     }
 
     @Test
     @DisplayName("추가 근무가 있는 일일 근태 기록 조회 시, 일일 근태 기록만 조회")
     public void findById_existExtraWorks() {
         // When
-        final LocalDate today = LocalDate.now();
-        final LocalDateTime startAt = LocalDateTime.of(today, LocalTime.of(5, 0));
-        final LocalDateTime endAt = LocalDateTime.of(today, LocalTime.of(23, 0));
-        Attendance given = attendanceRepo.saveAndFlush(Attendance.of(startAt, endAt));
+        Attendance given = attendanceFixtureGenerator.연장근무와_야간근무가_포함된_근무_등록();
         entityManager.clear();
 
-        Attendance actual = attendanceRepo.findById(given.getId()).orElseThrow();
+        Attendance actual = attendanceRepo.findAttendanceById(given.getId()).orElseThrow();
 
         // Then
-        assertThat(actual).isEqualTo(given);
-    }
-
-    @Test
-    @DisplayName("일일 근태 기록 조회 시, Lazy laoding을 이용한 추가 근무 조회")
-    public void findByIdWithExtraWorks() {
-        // Given
-        final LocalDate today = LocalDate.now();
-        final LocalDateTime startAt = LocalDateTime.of(today, LocalTime.of(5, 0));
-        final LocalDateTime endAt = LocalDateTime.of(today, LocalTime.of(23, 0));
-        Attendance given = attendanceRepo.saveAndFlush(Attendance.of(startAt, endAt));
-        entityManager.clear();
-
-        // When
-        Attendance actual = attendanceRepo.findById(given.getId()).orElseThrow();
-
-        // Then
-        assertThat(actual.getExtraWorks())
-            .satisfies(extraWorks -> {
-                assertThat(extraWorks.getExtraWorkTypes()).containsOnly(ExtraWorkType.NIGHT_SHIFT, ExtraWorkType.OVERTIME);
-                assertThat(extraWorks.getSize()).isEqualTo(3);
-            });
+        assertAll(
+            () -> assertThat(actual).isEqualTo(given),
+            () -> assertThat(Hibernate.isInitialized(actual.getExtraWorks().getElements()))
+                .as("LAZY로 설정된 연관객체의 Proxy 객체 여부")
+                .isFalse()
+        );
     }
 
     @Test
@@ -141,7 +125,7 @@ class AttendanceRepoTest {
         attendanceFixtureGenerator.근무_목록_생성(requestSize);
         entityManager.clear();
 
-        final YearMonth yearMonth = YearMonth.from(LocalDate.now()) ;
+        final YearMonth yearMonth = YearMonth.from(LocalDate.now());
         final int requestPage = 0;
         final int perPageNum = 10;
         final String sortProperties = "createdAt";

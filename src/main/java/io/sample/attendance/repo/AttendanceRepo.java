@@ -7,8 +7,10 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.YearMonth;
+import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -33,4 +35,10 @@ public interface AttendanceRepo extends JpaRepository<Attendance, Long> {
         LocalDateTime to = LocalDateTime.of(firstDayOfYearMonth.with(lastDayOfMonth()), LocalTime.MAX);
         return findAttendanceWithExtraWorksPageByMonthly(from, to, pageable);
     }
+
+    @Override
+    @EntityGraph(attributePaths = "extraWorks.elements")
+    Optional<Attendance> findById(@Param(value = "id") Long id);
+
+    Optional<Attendance> findAttendanceById(@Param(value = "id") Long id);
 }
