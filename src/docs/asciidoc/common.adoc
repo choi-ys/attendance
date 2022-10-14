@@ -8,7 +8,7 @@ TIP: ** API 호출 시 Endpoint 구성에 필요한 도메인 정보를 제공�
 |===
 | 환경 | 도메인
 | DEV | dev-api.attendance.io
-| PRD | api.attendance.io
+| PRD | api.board.io
 |===
 ****
 
@@ -28,6 +28,7 @@ TIP: ** API 호출에 필요한 요청 메세지 구조에 대한 정보를 제�
 
 TIP: ** 목록 API 호출 시 응답 내 페이징 처리에 대한 구조 정보를 제공합니다. **
 
+operation::common-docs-snippet-controller-test/common-pagination-response[snippets='response-fields']
 ====
 
 
@@ -37,7 +38,9 @@ TIP: ** 목록 API 호출 시 응답 내 페이징 처리에 대한 구조 정�
 IMPORTANT: ** API 호출 시 에러가 발생했을 때 (상태 코드 >= 400), 응답 본문에 해당 문제를 기술한 JSON 객체를 반환합니다.
 에러 응답 객체는 다음과 같은 구조로 구성되어 있습니다. **
 
+operation::attendance-controller-test/throw-exception_-when-empty-attendance-request[snippets='response-fields']
 
 WARNING: ** 예를 들어, 잘못된 요청으로 출결을 등록하려고 했을 때 다음과 같은 `400 Bad Request` 응답을 반환합니다. **
 
+operation::attendance-controller-test/throw-exception_-when-null-attendance-request[snippets='response-fields,http-request,http-response']
 ====
