@@ -59,6 +59,13 @@ public class SpringBootTestBase {
         );
     }
 
+    public ResultActions get(String urlTemplate, Object path) throws Exception {
+        return mockMvc.perform(RestDocumentationRequestBuilders.get(urlTemplate, path)
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON)
+        );
+    }
+
     public ResultActions get(String urlTemplate, MultiValueMap<String, String> paramMap) throws Exception {
         return mockMvc.perform(MockMvcRequestBuilders.get(urlTemplate)
             .params(paramMap)

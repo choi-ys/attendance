@@ -1,9 +1,14 @@
 package io.sample.attendance.api;
 
-import static io.sample.attendance.fixture.AttendanceFixtureGenerator.야간근무가_포함된_근무_생성_요청;
-import static io.sample.attendance.fixture.AttendanceFixtureGenerator.연장근무가_포함된_근무_생성_요청;
-import static io.sample.attendance.fixture.AttendanceFixtureGenerator.연장근무와_야간근무가_포함된_근무_생성_요청;
-import static io.sample.attendance.fixture.AttendanceFixtureGenerator.추가_근무가_없는_근무_생성_요청;
+import static io.sample.attendance.generator.docs.AttendanceDocsGenerator.emptyRegisterAttendanceRequestDocument;
+import static io.sample.attendance.generator.docs.AttendanceDocsGenerator.getAnAttendanceDocument;
+import static io.sample.attendance.generator.docs.AttendanceDocsGenerator.getAttendancesDocument;
+import static io.sample.attendance.generator.docs.AttendanceDocsGenerator.invalidRegisterAttendanceRequestDocument;
+import static io.sample.attendance.generator.docs.AttendanceDocsGenerator.saveAttendanceDocument;
+import static io.sample.attendance.generator.fixture.AttendanceFixtureGenerator.야간근무가_포함된_근무_생성_요청;
+import static io.sample.attendance.generator.fixture.AttendanceFixtureGenerator.연장근무가_포함된_근무_생성_요청;
+import static io.sample.attendance.generator.fixture.AttendanceFixtureGenerator.연장근무와_야간근무가_포함된_근무_생성_요청;
+import static io.sample.attendance.generator.fixture.AttendanceFixtureGenerator.추가_근무가_없는_근무_생성_요청;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
@@ -31,11 +36,12 @@ import org.springframework.util.MultiValueMap;
 @DisplayName("API:Attendance")
 class AttendanceControllerTest extends SpringBootTestBase {
     public static final String ATTENDANCE_BASE_URL = "/attendance";
+    public static final String GET_AN_ATTENDANCE_URL = "/attendance/{id}";
     public static final String GET_MONTHLY_ATTENDANCE_URL = ATTENDANCE_BASE_URL.concat("/monthly");
     public static final String YEAR_MONTH = "yearMonth";
 
     @Test
-    @DisplayName("[201:POST]근태 기록 등록")
+    @DisplayName("[201:POST]추가 근무가 없는 근태 기록 등록")
     public void registerAttendance() throws Exception {
         // When
         ResultActions 근무_기록_등록_응답 = 근무_기록_등록_요청(추가_근무가_없는_근무_생성_요청());
@@ -45,8 +51,20 @@ class AttendanceControllerTest extends SpringBootTestBase {
         추가_근무가_없는_근무_기록_응답_항목_검증(근무_기록_등록_응답);
     }
 
-    private ResultActions 근무_기록_등록_요청(AttendanceRequest 근무_기록_생성_요청) throws Exception {
-        return post(ATTENDANCE_BASE_URL, 근무_기록_생성_요청);
+    @Test
+    @DisplayName("[201:POST]추가 근무가 있는 근태 기록 등록")
+    public void registerAttendanceWithExtraWorks() throws Exception {
+        // When
+        ResultActions 근무_기록_등록_응답 = 근무_기록_등록_요청(연장근무와_야간근무가_포함된_근무_생성_요청());
+
+        // Then
+        근무_기록_등록_응답_검증(근무_기록_등록_응답);
+        추가_근무가_있는_근무_기록_응답_항목_검증(근무_기록_등록_응답);
+        추가_근무가_있는_근태_기록_등록_문서_생성(근무_기록_등록_응답);
+    }
+
+    private ResultActions 근무_기록_등록_요청(AttendanceRequest 근무_기록_생성_요청) {
+        return executeWithPersistContextClear(() -> post(ATTENDANCE_BASE_URL, 근무_기록_생성_요청));
     }
 
     private void 근무_기록_등록_응답_검증(ResultActions 근무_기록_등록_응답) throws Exception {
@@ -64,38 +82,11 @@ class AttendanceControllerTest extends SpringBootTestBase {
             .andExpect(jsonPath("$.workDuration.minute").exists())
             .andExpect(jsonPath("$.basicPay").exists())
             .andExpect(jsonPath("$.totalPay").exists())
-            .andExpect(jsonPath("$.extraWorks").isEmpty())
-        ;
+            .andExpect(jsonPath("$.extraWorks").isEmpty());
     }
 
-    @Test
-    @DisplayName("[400:POST]올바르지 않은 근태 기록 등록")
-    public void throwException_WhenInvalidAttendanceRequest() throws Exception {
-        // Given
-        final LocalDateTime now = LocalDateTime.now();
-        AttendanceRequest 출근시간과_퇴근시간이_같은_근무_생성_요청 = AttendanceRequest.of(now, now);
-
-        // When
-        ResultActions 근무_기록_등록_응답 = 근무_기록_등록_요청(출근시간과_퇴근시간이_같은_근무_생성_요청);
-
-        // Then
-        근무_기록_등록_응답
-            .andDo(print())
-            .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    @DisplayName("[200:GET]근태 기록 조회")
-    public void findAttendanceResponseById() throws Exception {
-        // Given
-        ResultActions 근무_기록_등록_응답 = 근무_기록_등록_요청(연장근무와_야간근무가_포함된_근무_생성_요청());
-
-        // When
-        ResultActions 근무_기록_조회_응답 = 근무_기록_조회_요청(getLocation(근무_기록_등록_응답));
-
-        // Then
-        근무_기록_조회_응답_검증(근무_기록_조회_응답);
-        추가_근무가_있는_근무_기록_응답_항목_검증(근무_기록_조회_응답);
+    private void 추가_근무가_있는_근태_기록_등록_문서_생성(ResultActions 근무_기록_등록_응답) throws Exception {
+        근무_기록_등록_응답.andDo(saveAttendanceDocument());
     }
 
     private void 추가_근무가_있는_근무_기록_응답_항목_검증(ResultActions 근무_기록_응답) throws Exception {
@@ -115,17 +106,97 @@ class AttendanceControllerTest extends SpringBootTestBase {
             .andExpect(jsonPath("$.extraWorks.[*].workDuration.hour").exists())
             .andExpect(jsonPath("$.extraWorks.[*].workDuration.minute").exists())
             .andExpect(jsonPath("$.extraWorks.[*].extraWorkType").exists())
-            .andExpect(jsonPath("$.extraWorks.[*].extraPay").exists())
-        ;
+            .andExpect(jsonPath("$.extraWorks.[*].extraPay").exists());
     }
 
-    private ResultActions 근무_기록_조회_요청(String URL) throws Exception {
-        return get(URL);
+    @Test
+    @DisplayName("[400:POST]요청값이 없는 기록 등록")
+    public void throwException_WhenEmptyAttendanceRequest() throws Exception {
+        // When
+        ResultActions 근무_기록_등록_응답 = 근무_기록_등록_요청(null);
+
+        // Then
+        요청값이_없는_출결_등록_응답_검증(근무_기록_등록_응답);
+        요청값이_없는_출결_등록_문서_생성(근무_기록_등록_응답);
+    }
+
+    private void 요청값이_없는_출결_등록_응답_검증(ResultActions 근무_기록_등록_응답) throws Exception {
+        근무_기록_등록_응답
+            .andDo(print())
+            .andExpect(status().isBadRequest());
+    }
+
+    private void 요청값이_없는_출결_등록_문서_생성(ResultActions 근무_기록_등록_응답) throws Exception {
+        근무_기록_등록_응답.andDo(emptyRegisterAttendanceRequestDocument());
+    }
+
+    @Test
+    @DisplayName("[400:POST]요청값이 없는 기록 등록")
+    public void throwException_WhenNullAttendanceRequest() throws Exception {
+        // Given
+        AttendanceRequest 요청값이_없는_근무_생성_요청 = AttendanceRequest.of(null, null);
+
+        // When
+        ResultActions 근무_기록_등록_응답 = 근무_기록_등록_요청(요청값이_없는_근무_생성_요청);
+
+        // Then
+        요청값이_없는_기록_등록_응답_검증(근무_기록_등록_응답);
+        요청값이_없는_기록_등록_문서_생성(근무_기록_등록_응답);
+    }
+
+    private void 요청값이_없는_기록_등록_응답_검증(ResultActions 근무_기록_등록_응답) throws Exception {
+        근무_기록_등록_응답
+            .andDo(print())
+            .andExpect(status().isBadRequest());
+    }
+
+    private void 요청값이_없는_기록_등록_문서_생성(ResultActions 근무_기록_등록_응답) throws Exception {
+        근무_기록_등록_응답.andDo(invalidRegisterAttendanceRequestDocument());
+    }
+
+    @Test
+    @DisplayName("[400:POST]올바르지 않은 근태 기록 등록")
+    public void throwException_WhenInvalidAttendanceRequest() throws Exception {
+        // Given
+        final LocalDateTime now = LocalDateTime.now();
+        AttendanceRequest 출근시간과_퇴근시간이_같은_근무_생성_요청 = AttendanceRequest.of(now, now);
+
+        // When
+        ResultActions 근무_기록_등록_응답 = 근무_기록_등록_요청(출근시간과_퇴근시간이_같은_근무_생성_요청);
+
+        // Then
+        근무_기록_등록_응답
+            .andDo(print())
+            .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("[200:GET]추가 근무가 있는 근태 기록 조회")
+    public void findAttendanceResponseById() throws Exception {
+        // Given
+        ResultActions 근무_기록_등록_응답 = 근무_기록_등록_요청(연장근무와_야간근무가_포함된_근무_생성_요청());
+        Long 근무_번호 = as(근무_기록_등록_응답, AttendanceResponse.class).getId();
+
+        // When
+        ResultActions 근무_기록_조회_응답 = 근무_기록_조회_요청(근무_번호);
+
+        // Then
+        근무_기록_조회_응답_검증(근무_기록_조회_응답);
+        추가_근무가_있는_근무_기록_응답_항목_검증(근무_기록_조회_응답);
+        추가_근무가_있는_근태_기록_조회_문서_생성(근무_기록_조회_응답);
+    }
+
+    private ResultActions 근무_기록_조회_요청(Long id) throws Exception {
+        return get(GET_AN_ATTENDANCE_URL, id);
     }
 
     private void 근무_기록_조회_응답_검증(ResultActions 근무_기록_조회_응답) throws Exception {
         근무_기록_조회_응답.andDo(print())
             .andExpect(status().isOk());
+    }
+
+    private void 추가_근무가_있는_근태_기록_조회_문서_생성(ResultActions 근무_기록_조회_응답) throws Exception {
+        근무_기록_조회_응답.andDo(getAnAttendanceDocument());
     }
 
     @Test
@@ -136,10 +207,11 @@ class AttendanceControllerTest extends SpringBootTestBase {
         String 조회월 = YearMonth.from(LocalDate.now()).toString();
 
         // When
-        ResultActions 특정월의_근태_목록_조회_응답 = 특정월의_근태_목록_조회_요청(GET_MONTHLY_ATTENDANCE_URL, 조회월);
+        ResultActions 특정월의_근태_목록_조회_응답 = 특정월의_근태_목록_조회_요청(조회월);
 
         // Then
         특정월의_근태_목록_조회_응답_검증(특정월의_근무_목록_생성_응답, 특정월의_근태_목록_조회_응답);
+        특정월의_근태_목록_조회_문서_생성(특정월의_근태_목록_조회_응답);
     }
 
     private List<AttendanceResponse> 특정월의_근무_목록_생성() throws Exception {
@@ -151,10 +223,10 @@ class AttendanceControllerTest extends SpringBootTestBase {
         return Arrays.asList(근무_기록_등록_응답, 연장근무가_포함된_근무_등록_응답, 야간근무가_포함된_근무_등록_응답, 연장근무와_야간근무가_포함된_근무_등록_응답);
     }
 
-    private ResultActions 특정월의_근태_목록_조회_요청(String URL, String yearMonth) throws Exception {
+    private ResultActions 특정월의_근태_목록_조회_요청(String yearMonth) throws Exception {
         MultiValueMap<String, String> 조회_요청_정보 = new LinkedMultiValueMap<>();
         조회_요청_정보.add(YEAR_MONTH, yearMonth);
-        return get(URL, 조회_요청_정보);
+        return get(GET_MONTHLY_ATTENDANCE_URL, 조회_요청_정보);
     }
 
     private void 특정월의_근태_목록_조회_응답_검증(List<AttendanceResponse> 특정월의_근무_목록_생성_응답, ResultActions 특정월의_근태_목록_조회_응답) throws Exception {
@@ -173,5 +245,9 @@ class AttendanceControllerTest extends SpringBootTestBase {
             .collect(Collectors.toList());
 
         assertThat(actualIds).containsAll(givenIds);
+    }
+
+    private void 특정월의_근태_목록_조회_문서_생성(ResultActions resultActions) throws Exception {
+        resultActions.andDo(getAttendancesDocument());
     }
 }
