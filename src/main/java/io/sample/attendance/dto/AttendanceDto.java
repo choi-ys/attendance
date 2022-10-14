@@ -2,6 +2,7 @@ package io.sample.attendance.dto;
 
 import io.sample.attendance.domain.Attendance;
 import io.sample.attendance.domain.ExtraWorks;
+import io.sample.attendance.domain.TimeTable;
 import io.sample.attendance.domain.WorkDuration;
 import io.sample.attendance.utils.PageableUtils;
 import java.time.LocalDateTime;
@@ -68,11 +69,12 @@ public class AttendanceDto {
         }
 
         public static AttendanceResponse of(Attendance attendance) {
+            TimeTable attendanceTimeTable = TimeTable.of(attendance.getStartAt(), attendance.getEndAt());
             return new AttendanceResponse(
                 attendance.getId(),
-                attendance.getStartAt(),
-                attendance.getEndAt(),
-                attendance.getWorkDuration(),
+                attendanceTimeTable.getStartAt(),
+                attendanceTimeTable.getEndAt(),
+                attendanceTimeTable.getWorkDuration(),
                 attendance.getBasicPay(),
                 attendance.getTotalPay(),
                 of(attendance.getExtraWorks())

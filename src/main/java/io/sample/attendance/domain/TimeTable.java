@@ -41,7 +41,7 @@ public class TimeTable {
         return new TimeTable(startAt, endAt);
     }
 
-    private WorkDuration calculateDuration() {
+    public WorkDuration calculateDuration() {
         int totalMinute = getWorkDurationByMinute();
         int hour = totalMinute / MINUTE_PER_HOUR;
         int minute = totalMinute % MINUTE_PER_HOUR;

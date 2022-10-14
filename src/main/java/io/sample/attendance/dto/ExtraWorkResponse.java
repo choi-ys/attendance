@@ -2,6 +2,7 @@ package io.sample.attendance.dto;
 
 import io.sample.attendance.domain.ExtraWork;
 import io.sample.attendance.domain.ExtraWorkType;
+import io.sample.attendance.domain.TimeTable;
 import io.sample.attendance.domain.WorkDuration;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
@@ -35,11 +36,12 @@ public class ExtraWorkResponse {
     }
 
     public static ExtraWorkResponse from(ExtraWork extraWork) {
+        TimeTable extraWorkTimeTable = TimeTable.of(extraWork.getStartAt(), extraWork.getEndAt());
         return new ExtraWorkResponse(
             extraWork.getId(),
-            extraWork.getStartAt(),
-            extraWork.getEndAt(),
-            extraWork.getWorkDuration(),
+            extraWorkTimeTable.getStartAt(),
+            extraWorkTimeTable.getEndAt(),
+            extraWorkTimeTable.getWorkDuration(),
             extraWork.getExtraWorkType(),
             extraWork.getPay()
         );
