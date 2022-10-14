@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.util.List;
 import java.util.stream.Collectors;
+import javax.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,7 +18,10 @@ public class AttendanceDto {
     @Getter
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static class AttendanceRequest {
+        @NotNull(message = "근무 시작시간은 빈값일 수 없습니다.")
         private LocalDateTime startAt;
+
+        @NotNull(message = "근무 종료시간은 빈값일 수 없습니다.")
         private LocalDateTime endAt;
 
         private AttendanceRequest(LocalDateTime startAt, LocalDateTime endAt) {

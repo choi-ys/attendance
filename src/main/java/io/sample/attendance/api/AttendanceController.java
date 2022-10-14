@@ -7,6 +7,7 @@ import io.sample.attendance.dto.AttendanceDto.MonthlyAttendanceRequest;
 import io.sample.attendance.global.response.PageResponse;
 import java.net.URI;
 import java.time.YearMonth;
+import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -35,7 +36,7 @@ public class AttendanceController {
     private final AttendanceService attendanceService;
 
     @PostMapping
-    public ResponseEntity<AttendanceResponse> registerAttendance(@RequestBody AttendanceRequest attendanceRequest) {
+    public ResponseEntity<AttendanceResponse> registerAttendance(@Valid @RequestBody AttendanceRequest attendanceRequest) {
         AttendanceResponse attendanceResponse = attendanceService.saveAttendance(attendanceRequest);
         return ResponseEntity.created(uriFormatter(attendanceResponse.getId())).body(attendanceResponse);
     }
