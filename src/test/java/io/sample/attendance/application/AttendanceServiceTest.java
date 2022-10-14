@@ -12,7 +12,7 @@ import io.sample.attendance.dto.AttendanceDto.AttendanceRequest;
 import io.sample.attendance.dto.AttendanceDto.AttendanceResponse;
 import io.sample.attendance.dto.AttendanceDto.MonthlyAttendanceRequest;
 import io.sample.attendance.dto.ExtraWorkResponse;
-import io.sample.attendance.fixture.AttendanceFixtureGenerator;
+import io.sample.attendance.generator.fixture.AttendanceFixtureGenerator;
 import io.sample.attendance.global.response.PageResponse;
 import io.sample.attendance.repo.AttendanceRepo;
 import java.time.LocalDate;

@@ -1,4 +1,4 @@
-package io.sample.attendance.fixture;
+package io.sample.attendance.generator.fixture;
 
 import static org.hibernate.type.IntegerType.ZERO;
 

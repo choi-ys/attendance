@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import com.github.gavlyukovskiy.boot.jdbc.decorator.DataSourceDecoratorAutoConfiguration;
 import io.sample.attendance.config.p6spy.P6spyLogMessageFormatConfiguration;
 import io.sample.attendance.domain.Attendance;
-import io.sample.attendance.fixture.AttendanceFixtureGenerator;
+import io.sample.attendance.generator.fixture.AttendanceFixtureGenerator;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import javax.persistence.EntityManager;
