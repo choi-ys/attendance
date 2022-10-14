@@ -1,6 +1,6 @@
 package io.sample.attendance.global.event;
 
-import io.sample.attendance.global.exception.BusinessException;
+import io.sample.attendance.global.response.ErrorCode;
 import javax.servlet.http.HttpServletRequest;
 import lombok.Getter;
 
@@ -8,16 +8,22 @@ import lombok.Getter;
 public class ThrowsException {
     private static final int MAXIMUM_ABBREVIATED_STACK_TRACE_COUNT = 5;
 
-    private BusinessException exception;
+    private Exception exception;
     private HttpServletRequest Request;
+    private ErrorCode errorCode;
 
-    private ThrowsException(BusinessException exception, HttpServletRequest Request) {
-        this.exception = exception;
+    protected ThrowsException(HttpServletRequest Request) {
         this.Request = Request;
     }
 
-    public static ThrowsException of(BusinessException exception, HttpServletRequest Request) {
-        return new ThrowsException(exception, Request);
+    private ThrowsException(Exception exception, HttpServletRequest Request, ErrorCode errorCode) {
+        this.exception = exception;
+        this.Request = Request;
+        this.errorCode = errorCode;
+    }
+
+    public static ThrowsException of(Exception exception, HttpServletRequest Request, ErrorCode errorCode) {
+        return new ThrowsException(exception, Request, errorCode);
     }
 
     public String getAbbreviatedExceptionStaceTrace() {

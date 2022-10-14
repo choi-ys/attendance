@@ -2,6 +2,7 @@ package io.sample.attendance.global.response;
 
 import io.sample.attendance.global.exception.BusinessException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import lombok.AccessLevel;
@@ -17,7 +18,7 @@ public class ErrorResponse {
     private String path;
     private String code;
     private String message;
-    private List<ErrorDetail> errorDetails;
+    private List<ErrorDetail> errorDetails = new ArrayList<>();
 
     private ErrorResponse(String method, String path, String code, String message) {
         this.method = method;

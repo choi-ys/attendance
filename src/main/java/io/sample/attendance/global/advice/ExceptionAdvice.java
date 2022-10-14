@@ -1,5 +1,6 @@
 package io.sample.attendance.global.advice;
 
+import io.sample.attendance.global.event.ThrowsBusinessException;
 import io.sample.attendance.global.event.ThrowsException;
 import io.sample.attendance.global.exception.BusinessException;
 import io.sample.attendance.global.response.ErrorCode;
@@ -26,7 +27,7 @@ public class ExceptionAdvice {
 
     @ExceptionHandler(BusinessException.class)
     public ResponseEntity<ErrorResponse> businessException(BusinessException exception, HttpServletRequest request) {
-        applicationEventPublisher.publishEvent(ThrowsException.of(exception, request));
+        applicationEventPublisher.publishEvent(ThrowsBusinessException.of(exception, request));
         return ResponseEntity
             .status(exception.getHttpStatus())
             .body(ErrorResponse.businessErrorOf(exception, request));
@@ -35,6 +36,7 @@ public class ExceptionAdvice {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> unexpectedException(Exception exception, HttpServletRequest request) {
         ErrorCode errorCode = ErrorCode.UNEXPECTED_ERROR;
+        applicationEventPublisher.publishEvent(ThrowsException.of(exception, request, errorCode));
         return ResponseEntity
             .status(errorCode.httpStatus)
             .body(ErrorResponse.errorResponseOf(errorCode, request));
@@ -51,6 +53,7 @@ public class ExceptionAdvice {
     })
     public ResponseEntity<ErrorResponse> invalidRequestException(Exception exception, HttpServletRequest request) {
         ErrorCode errorCode = ErrorCode.valueOf(exception);
+        applicationEventPublisher.publishEvent(ThrowsException.of(exception, request, errorCode));
         return ResponseEntity
             .status(errorCode.httpStatus)
             .body(ErrorResponse.errorResponseOf(errorCode, request));
@@ -59,6 +62,7 @@ public class ExceptionAdvice {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> inValidArgumentException(MethodArgumentNotValidException exception, HttpServletRequest request) {
         ErrorCode errorCode = ErrorCode.valueOf(exception);
+        applicationEventPublisher.publishEvent(ThrowsException.of(exception, request, errorCode));
         return ResponseEntity
             .status(errorCode.httpStatus)
             .body(ErrorResponse.errorResponseWithFieldErrorsOf(exception, errorCode, request));
