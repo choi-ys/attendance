@@ -53,10 +53,10 @@ public class AttendanceServiceTest {
 
     @BeforeAll
     static void setUp() {
-        추가_근무가_없는_근무 = AttendanceFixtureGenerator.추가_근무가_없는_근무();
-        연장근무가_포함된_근무 = AttendanceFixtureGenerator.연장근무가_포함된_근무();
-        야간근무가_포함된_근무 = AttendanceFixtureGenerator.야간근무가_포함된_근무();
-        연장근무와_야간근무가_포함된_근무 = AttendanceFixtureGenerator.연장근무와_야간근무가_포함된_근무();
+        추가_근무가_없는_근무 = AttendanceFixtureGenerator.추가_근무가_없는_출결_생성();
+        연장근무가_포함된_근무 = AttendanceFixtureGenerator.연장근무가_포함된_출결_생성();
+        야간근무가_포함된_근무 = AttendanceFixtureGenerator.야간근무가_포함된_출결_생성();
+        연장근무와_야간근무가_포함된_근무 = AttendanceFixtureGenerator.연장근무와_야간근무가_포함된_출결_생성();
 
         추가_근무가_없는_근무_생성_요청 = AttendanceDto.AttendanceRequest.of(추가_근무가_없는_근무.getStartAt(), 추가_근무가_없는_근무.getEndAt());
         연장근무가_포함된_근무_생성_요청 = AttendanceDto.AttendanceRequest.of(연장근무가_포함된_근무.getStartAt(), 연장근무가_포함된_근무.getEndAt());
@@ -66,7 +66,7 @@ public class AttendanceServiceTest {
 
     @ParameterizedTest(name = "[Case#{index}]{0}")
     @MethodSource
-    @DisplayName("일일 근태 기록 생성")
+    @DisplayName("일일 출결 생성")
     public void saveAttendance(
         final String description,
         final Attendance 근무,
@@ -97,7 +97,7 @@ public class AttendanceServiceTest {
     }
 
     @Test
-    @DisplayName("특정 근태 기록 조회")
+    @DisplayName("특정 출결 조회")
     public void findAttendanceById() {
         // Given
         근무_조회_제어(연장근무가_포함된_근무);
@@ -129,29 +129,29 @@ public class AttendanceServiceTest {
     }
 
     @Test
-    @DisplayName("특정월의 근태 목록 조회")
+    @DisplayName("기준년월의 출결 목록 조회")
     public void findMonthlyAttendanceResponsesById() {
         // Given
         final YearMonth 조회월 = YearMonth.from(LocalDate.now());
-        final List<Attendance> 특정월의_근태_목록 = Arrays.asList(추가_근무가_없는_근무, 연장근무가_포함된_근무, 야간근무가_포함된_근무, 연장근무와_야간근무가_포함된_근무);
-        final MonthlyAttendanceRequest 특정월의_근태_목록_조회_요청 = 특정월의_근태_목록_조회_요청_생성(조회월);
-        final Pageable 조회_페이지_정보 = 특정월의_근태_목록_조회_요청.getPageable();
-        특정월의_근태_목록_조회_제어(조회월, 조회_페이지_정보, 특정월의_근태_목록);
+        final List<Attendance> 기준년월의_출결_목록 = Arrays.asList(추가_근무가_없는_근무, 연장근무가_포함된_근무, 야간근무가_포함된_근무, 연장근무와_야간근무가_포함된_근무);
+        final MonthlyAttendanceRequest 기준년월의_출결_목록_조회_요청 = 기준년월의_출결_목록_조회_요청_생성(조회월);
+        final Pageable 조회_페이지_정보 = 기준년월의_출결_목록_조회_요청.getPageable();
+        기준년월의_출결_목록_조회_제어(조회월, 조회_페이지_정보, 기준년월의_출결_목록);
 
         // When
-        PageResponse<AttendanceResponse> 특정월의_근태_목록_조회_응답 = attendanceService.findAttendanceResponsesByMonthly(특정월의_근태_목록_조회_요청);
+        PageResponse<AttendanceResponse> 기준년월의_출결_목록_조회_응답 = attendanceService.findAttendanceResponsesByMonthly(기준년월의_출결_목록_조회_요청);
 
         // Then
-        특정월의_근태_목록_응답_검증(특정월의_근태_목록, 특정월의_근태_목록_조회_응답);
+        기준년월의_출결_목록_응답_검증(기준년월의_출결_목록, 기준년월의_출결_목록_조회_응답);
         verify(attendanceRepo).findAttendanceWithExtraWorksPageByMonthly(조회월, 조회_페이지_정보);
     }
 
-    private void 특정월의_근태_목록_조회_제어(YearMonth yearMonth, Pageable pageable, List<Attendance> attendances) {
+    private void 기준년월의_출결_목록_조회_제어(YearMonth yearMonth, Pageable pageable, List<Attendance> attendances) {
         PageImpl<Attendance> pageResponse = new PageImpl<>(attendances, pageable, attendances.size());
         given(attendanceRepo.findAttendanceWithExtraWorksPageByMonthly(yearMonth, pageable)).willReturn(pageResponse);
     }
 
-    private MonthlyAttendanceRequest 특정월의_근태_목록_조회_요청_생성(YearMonth yearMonth) {
+    private MonthlyAttendanceRequest 기준년월의_출결_목록_조회_요청_생성(YearMonth yearMonth) {
         final int requestPage = 0;
         final int perPageNum = 10;
         final String sortingProperties = "startAt";
@@ -159,7 +159,7 @@ public class AttendanceServiceTest {
         return MonthlyAttendanceRequest.of(yearMonth, PageRequest.of(requestPage, perPageNum, sort));
     }
 
-    private void 특정월의_근태_목록_응답_검증(List<Attendance> attendances, PageResponse<AttendanceResponse> attendanceResponses) {
+    private void 기준년월의_출결_목록_응답_검증(List<Attendance> attendances, PageResponse<AttendanceResponse> attendanceResponses) {
         List<Long> collect = attendances.stream()
             .map(Attendance::getId)
             .collect(Collectors.toList());

@@ -17,7 +17,7 @@ public class NightShiftCalculator {
     public static final LocalTime NIGHT_SHIFT_END_TIME = LocalTime.of(NIGHT_SHIFT_END_HOUR, ZERO);
 
     /**
-     * @param attendance 일일 근태 정보
+     * @param attendance 일일 출결 정보
      * @return 야간 근무 여부
      * @implNote 야간 근무 여부를 판별 한다.
      * <pre>
@@ -37,7 +37,7 @@ public class NightShiftCalculator {
     }
 
     /**
-     * @param attendance 일일 근태 정보
+     * @param attendance 일일 출결 정보
      * @return 당일 퇴근 여부
      * @implNote 출근 일자와 퇴근 일자를 비교하여 당일 퇴근 여부를 판별한다.
      */
@@ -46,7 +46,7 @@ public class NightShiftCalculator {
     }
 
     /**
-     * @param attendance 일일 근태 정보
+     * @param attendance 일일 출결 정보
      * @return 출근 혹은 퇴근 시간이 야간 근무 산정 범위에 포함되는지 여부
      */
     private static boolean isIncludeStartOrEnd(Attendance attendance) {
@@ -62,7 +62,7 @@ public class NightShiftCalculator {
     }
 
     /**
-     * @param attendance 일일 근태 정보
+     * @param attendance 일일 출결 정보
      * @return 야간 근무 구간
      * @implNote 출/퇴근 시간으로부터 근무 중 야간 근무에 해당하는 구간을 추출한다.
      */
@@ -74,7 +74,7 @@ public class NightShiftCalculator {
     }
 
     /**
-     * @param attendance                일일 근태 정보
+     * @param attendance                일일 출결 정보
      * @param hoursOfNightShiftRange    출근 시간부터 퇴근시간 까지의 근무 시간 중 야간 근무 산정 범위에 포함되는 시간대 목록
      * @param nightShiftEndHoursIndices 야간 근무 산정 범위에 포함되는 시간 대 배열의 원소 중 야간 근무 종료 시간 원소의 위치
      * @implNote 전체 근무 시간 중 야간 근무 구간의 시작/종료 시간 추출을 위해, 야간 근무 산정 범위에 포함되는 시간대만 필터링한다.
@@ -113,7 +113,7 @@ public class NightShiftCalculator {
      * @apiNote 야간 근무 산정 범위에 포함되는 시간대를 필터링 한 후, 야간 근무 종료 시간이 6시 이므로, 첫번쨰 원소의 시간대가 6인지를 체크한다.
      */
     private static LocalDateTime checkFistCondition(LocalDateTime startCondition) {
-        if (startCondition.getHour() == 6) {
+        if (startCondition.getHour() == NIGHT_SHIFT_END_HOUR) {
             return startCondition.plusHours(1);
         }
         return startCondition;
@@ -136,7 +136,7 @@ public class NightShiftCalculator {
     }
 
     /**
-     * @param attendance                일일 근태 정보
+     * @param attendance                일일 출결 정보
      * @param hoursOfNightShiftRange    출근 시간부터 퇴근시간 까지의 근무 시간 중 야간 근무 산정 범위에 포함되는 시간대 목록
      * @param nightShiftEndHoursIndices 야간 근무 산정 범위에 포함되는 시간 대 배열의 원소 중 야간 근무 종료 시간 원소의 위치
      * @return 야간 근무 구간 목록
@@ -156,7 +156,7 @@ public class NightShiftCalculator {
     }
 
     /**
-     * @param attendance                일일 근태 정보
+     * @param attendance                일일 출결 정보
      * @param hoursOfNightShiftRange    출근 시간부터 퇴근시간 까지의 근무 시간 중 야간 근무 산정 범위에 포함되는 시간대 목록
      * @param nightShiftEndHoursIndices 야간 근무 산정 범위에 포함되는 시간 대 배열의 원소 중 야간 근무 종료 시간 원소의 위치
      * @return 첫번째 야간 근무 구간
@@ -237,7 +237,7 @@ public class NightShiftCalculator {
     }
 
     /**
-     * @param attendance                일일 근태 정보
+     * @param attendance                일일 출결 정보
      * @param hoursOfNightShiftRange    출근 시간부터 퇴근시간 까지의 근무 시간 중 야간 근무 산정 범위에 포함되는 시간대 목록
      * @param nightShiftEndHoursIndices 야간 근무 산정 범위에 포함되는 시간 대 배열의 원소 중 야간 근무 종료 시간 원소의 위치
      * @return 두번째 야간 근무 구간
@@ -256,11 +256,15 @@ public class NightShiftCalculator {
         List<LocalDateTime> hoursOfNightShiftRange,
         List<Integer> nightShiftEndHoursIndices
     ) {
-        LocalDateTime nightShiftStartAt = hoursOfNightShiftRange.get(nightShiftEndHoursIndices.get(0) + 1);
+        LocalDateTime nightShiftStartAt = hoursOfNightShiftRange.get(getNextIndex(nightShiftEndHoursIndices));
         LocalDateTime endAt = attendance.getEndAt();
         if (isNightShiftHour(endAt.toLocalTime())) {
             return ExtraWork.of(attendance, nightShiftStartAt, endAt, ExtraWorkType.NIGHT_SHIFT);
         }
-        return ExtraWork.of(attendance, nightShiftStartAt, endAt.withHour(6).withMinute(0), ExtraWorkType.NIGHT_SHIFT);
+        return ExtraWork.of(attendance, nightShiftStartAt, endAt.withHour(NIGHT_SHIFT_END_HOUR).withMinute(ZERO), ExtraWorkType.NIGHT_SHIFT);
+    }
+
+    private static int getNextIndex(List<Integer> nightShiftEndHoursIndices) {
+        return nightShiftEndHoursIndices.get(0) + 1;
     }
 }

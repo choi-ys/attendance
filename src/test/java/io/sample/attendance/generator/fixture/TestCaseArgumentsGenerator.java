@@ -15,7 +15,7 @@ public class TestCaseArgumentsGenerator {
 
     public static Object[] notNightShift() {
         return new Object[]{
-            "야간 근무가 없는 정규 근무",
+            "야간 근무가 없는 출결",
             LocalDateTime.of(today, LocalTime.of(6, ZERO)),
             LocalDateTime.of(today, LocalTime.of(22, ZERO))
         };
@@ -23,7 +23,7 @@ public class TestCaseArgumentsGenerator {
 
     public static Object[] oneNightShiftSectionAndOneWorkDay() {
         return new Object[]{
-            "당일 퇴근이고, 야간 근무 구간이 1개인 경우",
+            "당일 퇴근이고, 야간 근무 구간이 1개인 출결",
             LocalDateTime.of(today, LocalTime.of(6, ZERO)),
             LocalDateTime.of(today, LocalTime.of(22, 1))
         };
@@ -31,7 +31,7 @@ public class TestCaseArgumentsGenerator {
 
     public static Object[] oneNightShiftSectionAndTwoWorkDay() {
         return new Object[]{
-            "익일 퇴근이고, 야간 근무 구간이 1개인 경우",
+            "익일 퇴근이고, 야간 근무 구간이 1개인 출결",
             LocalDateTime.of(today, LocalTime.of(6, ZERO)),
             LocalDateTime.of(nextDay, LocalTime.of(6, 1))
         };
@@ -39,7 +39,7 @@ public class TestCaseArgumentsGenerator {
 
     public static Object[] twoNightShiftSectionAndOneWorkDay() {
         return new Object[]{
-            "당일 퇴근이고, 야간 근무 구간이 2개인 경우",
+            "당일 퇴근이고, 야간 근무 구간이 2개인 출결",
             LocalDateTime.of(today, LocalTime.of(5, 59)),
             LocalDateTime.of(today, LocalTime.of(22, 1)),
         };
@@ -47,7 +47,7 @@ public class TestCaseArgumentsGenerator {
 
     public static Object[] twoNightShiftSectionAndTwoWorkDay() {
         return new Object[]{
-            "익일 퇴근이고, 야간 근무 구간이 2개인 경우",
+            "익일 퇴근이고, 야간 근무 구간이 2개인 출결",
             LocalDateTime.of(today, LocalTime.of(22, 0)),
             LocalDateTime.of(nextDay, LocalTime.of(22, 1)),
         };
@@ -55,7 +55,7 @@ public class TestCaseArgumentsGenerator {
 
     public static Object[] oneNightShiftSectionAndTwoWorkDayAndMaximumWork() {
         return new Object[]{
-            "최대 28시간 근무, 익일 퇴근이고 야간 근무 구간이 1개인 경우",
+            "최대 28시간 근무, 익일 퇴근이고 야간 근무 구간이 1개인 출결",
             LocalDateTime.of(today, LocalTime.of(6, ZERO)),
             LocalDateTime.of(nextDay, LocalTime.of(10, ZERO)),
         };
@@ -63,7 +63,7 @@ public class TestCaseArgumentsGenerator {
 
     public static Object[] twoNightShiftSectionAndTwoWorkDayAndMaximumWork() {
         return new Object[]{
-            "최대 28시간 근무, 익일 퇴근이고 야간 근무 구간이 2개인 경우",
+            "최대 28시간 근무, 익일 퇴근이고 야간 근무 구간이 2개인 출결",
             LocalDateTime.of(today, LocalTime.of(20, 1)),
             LocalDateTime.of(nextDay, LocalTime.of(23, 59)),
         };
@@ -71,7 +71,7 @@ public class TestCaseArgumentsGenerator {
 
     public static Object[] twoNightShiftSectionAndThreeWorkDayAndMaximumWork() {
         return new Object[]{
-            "최대 28시간 근무, 2일 후 퇴근이고 야간 근무 구간이 2개인 경우",
+            "최대 28시간 근무, 2일 후 퇴근이고 야간 근무 구간이 2개인 출결",
             LocalDateTime.of(today, LocalTime.of(22, 0)),
             LocalDateTime.of(afterTwoDays, LocalTime.of(1, 59)),
         };

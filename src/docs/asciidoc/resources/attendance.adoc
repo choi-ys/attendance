@@ -22,9 +22,9 @@ operation::attendance-controller-test/find-attendance-response-by-id[snippets='h
 ====
 
 [[resources-update-an-attendance]]
-=== ** 특정월의 출결 정보 조회 : `*GET*` Attendance **
+=== ** 기준년월의 출결 정보 조회 : `*GET*` Attendance **
 [example]
-`*GET*` 요청을 사용하여 특정월의 출결 정보를 조회할 수 있습니다.
+`*GET*` 요청을 사용하여 기준년월의 출결 정보를 조회할 수 있습니다.
 
 ====
 operation::attendance-controller-test/find-attendances-monthly[snippets='http-request,request-headers,request-parameters,http-response,response-fields']

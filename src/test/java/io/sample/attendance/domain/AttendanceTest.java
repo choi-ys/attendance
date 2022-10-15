@@ -48,7 +48,7 @@ class AttendanceTest {
     }
 
     @Test
-    @DisplayName("추가 근무가 없는 근태의 급여 산출")
+    @DisplayName("추가 근무가 없는 출결의 급여 산출")
     public void attendance_withoutAnyExtraWorks() {
         // Given
         final LocalDateTime startAt = LocalDateTime.of(today, LocalTime.of(9, ZERO));
@@ -74,7 +74,7 @@ class AttendanceTest {
     }
 
     @Test
-    @DisplayName("연장 근무가 포함된 근태의 급여 산출")
+    @DisplayName("연장 근무가 포함된 출결의 급여 산출")
     public void attendance_containsOvertime() {
         // Given
         final LocalDateTime startAt = LocalDateTime.of(today, LocalTime.of(9, ZERO));
@@ -109,7 +109,7 @@ class AttendanceTest {
     }
 
     @Test
-    @DisplayName("야간 근무가 포함된 근태의 급여 산출")
+    @DisplayName("야간 근무가 포함된 출결의 급여 산출")
     public void attendance_containsNightShift() {
         // Given
         final LocalDateTime startAt = LocalDateTime.of(today, LocalTime.of(21, 5));
@@ -147,7 +147,7 @@ class AttendanceTest {
     }
 
     @Test
-    @DisplayName("연장/야간 근무가 포함된 근태의 급여 산출")
+    @DisplayName("연장/야간 근무가 포함된 출결의 급여 산출")
     public void attendance_containsOvertimeAndNightShift() {
         // Given
         final LocalDateTime startAt = LocalDateTime.of(today, LocalTime.of(5, 30));

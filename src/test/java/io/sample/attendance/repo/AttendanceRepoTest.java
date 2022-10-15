@@ -43,10 +43,10 @@ class AttendanceRepoTest {
     }
 
     @Test
-    @DisplayName("추가 근무가 없는 일일 근태 기록 저장")
+    @DisplayName("추가 근무가 없는 일일 출결 저장")
     public void save() {
         // Given
-        Attendance given = AttendanceFixtureGenerator.추가_근무가_없는_근무();
+        Attendance given = AttendanceFixtureGenerator.추가_근무가_없는_출결_생성();
 
         // When
         Attendance actual = attendanceRepo.save(given);
@@ -60,10 +60,10 @@ class AttendanceRepoTest {
     }
 
     @Test
-    @DisplayName("추가 근무가 있는 일일 근태 기록 저장")
+    @DisplayName("추가 근무가 있는 일일 출결 저장")
     public void save_existExtraWorks() {
         // When
-        Attendance given = attendanceFixtureGenerator.연장근무와_야간근무가_포함된_근무_등록();
+        Attendance given = attendanceFixtureGenerator.연장근무와_야간근무가_포함된_출결_등록();
         Attendance actual = attendanceRepo.save(given);
 
         // Then
@@ -77,10 +77,10 @@ class AttendanceRepoTest {
     }
 
     @Test
-    @DisplayName("일일 근태 기록 조회 시 추가 근무와 함께 조회")
+    @DisplayName("추가 근무를 포함한 일일 출결 조회")
     public void findById() {
         // Given
-        Attendance given = attendanceFixtureGenerator.연장근무와_야간근무가_포함된_근무_등록();
+        Attendance given = attendanceFixtureGenerator.연장근무와_야간근무가_포함된_출결_등록();
         entityManager.clear();
 
         // When
@@ -100,10 +100,10 @@ class AttendanceRepoTest {
     }
 
     @Test
-    @DisplayName("추가 근무가 있는 일일 근태 기록 조회 시, 일일 근태 기록만 조회")
+    @DisplayName("추가 근무를 제외한 일일 출결 조회")
     public void findById_existExtraWorks() {
         // When
-        Attendance given = attendanceFixtureGenerator.연장근무와_야간근무가_포함된_근무_등록();
+        Attendance given = attendanceFixtureGenerator.연장근무와_야간근무가_포함된_출결_등록();
         entityManager.clear();
 
         Attendance actual = attendanceRepo.findAttendanceById(given.getId()).orElseThrow();
@@ -118,11 +118,11 @@ class AttendanceRepoTest {
     }
 
     @Test
-    @DisplayName("월별 근태 목록 조회")
+    @DisplayName("월별 출결 목록 조회")
     public void findByAttendanceAndExtraWorksPageByCreatedAt() {
         // Given
         final int requestSize = 5;
-        attendanceFixtureGenerator.근무_목록_생성(requestSize);
+        attendanceFixtureGenerator.출결_목록_생성(requestSize);
         entityManager.clear();
 
         final YearMonth yearMonth = YearMonth.from(LocalDate.now());
