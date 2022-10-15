@@ -11,3 +11,8 @@
 
 include::overview.adoc[]
 include::common.adoc[]
+
+[[resources]]
+= ** API **
+
+include::resources/attendance.adoc[]

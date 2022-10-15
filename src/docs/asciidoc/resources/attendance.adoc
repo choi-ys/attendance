@@ -10,8 +10,6 @@ NOTE: ** Attendance API는 출결 관련 API Interface를 제공 합니다. **
 
 ====
 operation::attendance-controller-test/register-attendance-with-extra-works[snippets='http-request,request-headers,request-fields,http-response,response-fields']
-
-operation::common-docs-snippet-controller-test/enum-docs[snippets='enum-response-fields-extraWorkType']
 ====
 
 [[resources-get-an-attendance]]
@@ -21,8 +19,6 @@ operation::common-docs-snippet-controller-test/enum-docs[snippets='enum-response
 
 ====
 operation::attendance-controller-test/find-attendance-response-by-id[snippets='http-request,request-headers,path-parameters,http-response,response-fields']
-
-operation::common-docs-snippet-controller-test/enum-docs[snippets='enum-response-fields-extraWorkType']
 ====
 
 [[resources-update-an-attendance]]
@@ -32,6 +28,4 @@ operation::common-docs-snippet-controller-test/enum-docs[snippets='enum-response
 
 ====
 operation::attendance-controller-test/find-attendances-monthly[snippets='http-request,request-headers,request-parameters,http-response,response-fields']
-
-operation::common-docs-snippet-controller-test/enum-docs[snippets='enum-response-fields-extraWorkType']
 ====
