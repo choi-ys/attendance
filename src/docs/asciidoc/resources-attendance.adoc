@@ -9,8 +9,9 @@ NOTE: ** Attendance API는 출결 관련 API Interface를 제공 합니다. **
 `*POST*` 요청을 사용하여 출결을 등록할 수 있습니다.
 
 ====
-
 operation::attendance-controller-test/register-attendance-with-extra-works[snippets='http-request,request-headers,request-fields,http-response,response-fields']
+
+operation::common-docs-snippet-controller-test/enum-docs[snippets='enum-response-fields-extraWorkType']
 ====
 
 [[resources-get-an-attendance]]
@@ -19,16 +20,18 @@ operation::attendance-controller-test/register-attendance-with-extra-works[snipp
 `*GET*` 요청을 사용하여 출결을 조회할 수 있습니다.
 
 ====
-
 operation::attendance-controller-test/find-attendance-response-by-id[snippets='http-request,request-headers,path-parameters,http-response,response-fields']
+
+operation::common-docs-snippet-controller-test/enum-docs[snippets='enum-response-fields-extraWorkType']
 ====
 
 [[resources-update-an-attendance]]
 === ** 특정월의 출결 정보 조회 : `*GET*` Attendance **
 [example]
-`*PATCH*` 요청을 사용하여 게시글을 수정할 수 있습니다.
+`*GET*` 요청을 사용하여 특정월의 출결 정보를 조회할 수 있습니다.
 
 ====
-
 operation::attendance-controller-test/find-attendances-monthly[snippets='http-request,request-headers,request-parameters,http-response,response-fields']
+
+operation::common-docs-snippet-controller-test/enum-docs[snippets='enum-response-fields-extraWorkType']
 ====

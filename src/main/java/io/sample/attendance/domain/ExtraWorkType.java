@@ -1,9 +1,10 @@
 package io.sample.attendance.domain;
 
+import io.sample.attendance.domain.base.EnumType;
 import lombok.Getter;
 
 @Getter
-public enum ExtraWorkType {
+public enum ExtraWorkType implements EnumType {
     NIGHT_SHIFT(150, "야간 근무"),
     OVERTIME(100, "연장 근무");
 
@@ -25,5 +26,10 @@ public enum ExtraWorkType {
 
     public int calculateExtraPay(int totalExtraWorkMinutes) {
         return totalExtraWorkMinutes * this.extraPayPerMinute;
+    }
+
+    @Override
+    public String getName() {
+        return name();
     }
 }
