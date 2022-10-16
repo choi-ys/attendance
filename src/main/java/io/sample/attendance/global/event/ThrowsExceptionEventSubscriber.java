@@ -10,10 +10,10 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Slf4j
-public class ExceptionEventHandler {
+public class ThrowsExceptionEventSubscriber {
     @EventListener
     @Async
-    public void onExceptionEventListener(ThrowsBusinessException throwsBusinessException) {
+    public void onBusinessExceptionEventListener(ThrowsBusinessException throwsBusinessException) {
         BusinessException exception = throwsBusinessException.getException();
         HttpServletRequest request = throwsBusinessException.getRequest();
         log.error("[method : {}, uri : {}]\n[code :{}, message : {}]\n[trace : {}]",
@@ -25,7 +25,7 @@ public class ExceptionEventHandler {
 
     @EventListener
     @Async
-    public void onExceptionEventListener(ThrowsException throwsException) {
+    public void onBusinessExceptionEventListener(ThrowsException throwsException) {
         Exception exception = throwsException.getException();
         HttpServletRequest request = throwsException.getRequest();
         ErrorCode errorCode = throwsException.getErrorCode();
