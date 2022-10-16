@@ -1,10 +1,10 @@
 package io.sample.attendance.api;
 
 import io.sample.attendance.application.AttendanceService;
-import io.sample.attendance.dto.AttendanceDto.AttendanceRequest;
-import io.sample.attendance.dto.AttendanceDto.AttendanceResponse;
-import io.sample.attendance.dto.AttendanceDto.MonthlyAttendanceRequest;
-import io.sample.attendance.global.response.PageResponse;
+import io.sample.attendance.model.dto.AttendanceDto.AttendanceRequest;
+import io.sample.attendance.model.dto.AttendanceDto.AttendanceResponse;
+import io.sample.attendance.model.dto.AttendanceDto.MonthlyAttendanceRequest;
+import io.sample.global.response.PageResponse;
 import java.net.URI;
 import java.time.YearMonth;
 import javax.validation.Valid;

@@ -17,9 +17,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import io.sample.attendance.config.SpringBootTestBase;
-import io.sample.attendance.dto.AttendanceDto.AttendanceRequest;
-import io.sample.attendance.dto.AttendanceDto.AttendanceResponse;
-import io.sample.attendance.global.response.PageResponse;
+import io.sample.attendance.model.dto.AttendanceDto.AttendanceRequest;
+import io.sample.attendance.model.dto.AttendanceDto.AttendanceResponse;
+import io.sample.global.response.PageResponse;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.YearMonth;

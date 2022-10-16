@@ -2,10 +2,10 @@ package io.sample.attendance.utils;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import io.sample.attendance.domain.Attendance;
-import io.sample.attendance.domain.ExtraWork;
-import io.sample.attendance.domain.TimeTable;
-import io.sample.attendance.domain.WorkDuration;
+import io.sample.attendance.model.domain.Attendance;
+import io.sample.attendance.model.domain.ExtraWork;
+import io.sample.attendance.model.domain.TimeTable;
+import io.sample.attendance.model.domain.WorkDuration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;

@@ -1,8 +1,8 @@
 package io.sample.attendance.utils;
 
-import io.sample.attendance.domain.Attendance;
-import io.sample.attendance.domain.ExtraWork;
-import io.sample.attendance.domain.ExtraWorkType;
+import io.sample.attendance.model.domain.Attendance;
+import io.sample.attendance.model.domain.ExtraWork;
+import io.sample.attendance.model.domain.ExtraWorkType;
 import java.time.Duration;
 import java.time.LocalDateTime;
 

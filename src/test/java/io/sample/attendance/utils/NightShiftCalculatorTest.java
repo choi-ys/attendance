@@ -3,9 +3,9 @@ package io.sample.attendance.utils;
 import static io.sample.attendance.generator.fixture.TestCaseArgumentsGenerator.add;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import io.sample.attendance.domain.Attendance;
-import io.sample.attendance.domain.ExtraWork;
-import io.sample.attendance.domain.ExtraWorkType;
+import io.sample.attendance.model.domain.Attendance;
+import io.sample.attendance.model.domain.ExtraWork;
+import io.sample.attendance.model.domain.ExtraWorkType;
 import io.sample.attendance.generator.fixture.TestCaseArgumentsGenerator;
 import java.time.LocalDate;
 import java.time.LocalDateTime;

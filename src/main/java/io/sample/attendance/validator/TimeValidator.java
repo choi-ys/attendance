@@ -1,6 +1,6 @@
 package io.sample.attendance.validator;
 
-import io.sample.attendance.global.exception.InValidTimeException;
+import io.sample.attendance.exception.InValidTimeException;
 import java.time.LocalDateTime;
 
 public class TimeValidator {

@@ -2,9 +2,9 @@ package io.sample.attendance.utils;
 
 import static org.hibernate.type.IntegerType.ZERO;
 
-import io.sample.attendance.domain.Attendance;
-import io.sample.attendance.domain.ExtraWork;
-import io.sample.attendance.domain.ExtraWorkType;
+import io.sample.attendance.model.domain.Attendance;
+import io.sample.attendance.model.domain.ExtraWork;
+import io.sample.attendance.model.domain.ExtraWorkType;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;

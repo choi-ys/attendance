@@ -1,13 +1,13 @@
 package io.sample.attendance.application;
 
-import io.sample.attendance.domain.Attendance;
-import io.sample.attendance.dto.AttendanceDto.AttendanceRequest;
-import io.sample.attendance.dto.AttendanceDto.AttendanceResponse;
-import io.sample.attendance.dto.AttendanceDto.MonthlyAttendanceRequest;
-import io.sample.attendance.global.exception.ResourceNotFoundException;
-import io.sample.attendance.global.response.ErrorCode;
-import io.sample.attendance.global.response.PageResponse;
-import io.sample.attendance.repo.AttendanceRepo;
+import io.sample.attendance.model.domain.Attendance;
+import io.sample.attendance.model.dto.AttendanceDto.AttendanceRequest;
+import io.sample.attendance.model.dto.AttendanceDto.AttendanceResponse;
+import io.sample.attendance.model.dto.AttendanceDto.MonthlyAttendanceRequest;
+import io.sample.global.exception.ResourceNotFoundException;
+import io.sample.global.response.ErrorCode;
+import io.sample.global.response.PageResponse;
+import io.sample.attendance.model.domain.repo.AttendanceRepo;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;

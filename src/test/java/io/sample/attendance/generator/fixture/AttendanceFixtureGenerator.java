@@ -2,9 +2,9 @@ package io.sample.attendance.generator.fixture;
 
 import static org.hibernate.type.IntegerType.ZERO;
 
-import io.sample.attendance.domain.Attendance;
-import io.sample.attendance.dto.AttendanceDto.AttendanceRequest;
-import io.sample.attendance.repo.AttendanceRepo;
+import io.sample.attendance.model.domain.Attendance;
+import io.sample.attendance.model.dto.AttendanceDto.AttendanceRequest;
+import io.sample.attendance.model.domain.repo.AttendanceRepo;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;

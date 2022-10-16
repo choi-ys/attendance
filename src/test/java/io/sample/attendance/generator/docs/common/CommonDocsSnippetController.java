@@ -1,9 +1,9 @@
 package io.sample.attendance.generator.docs.common;
 
-import io.sample.attendance.domain.ExtraWorkType;
-import io.sample.attendance.domain.base.EnumType;
+import io.sample.attendance.model.domain.ExtraWorkType;
+import io.sample.global.model.EnumType;
 import io.sample.attendance.generator.docs.custom.EnumDocument;
-import io.sample.attendance.global.response.PageResponse;
+import io.sample.global.response.PageResponse;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
