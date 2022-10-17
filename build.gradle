@@ -3,6 +3,7 @@ plugins {
     id 'io.spring.dependency-management' version '1.0.13.RELEASE'
     id 'java'
     id 'org.asciidoctor.jvm.convert' version '3.3.2'
+    id 'com.epages.restdocs-api-spec' version '0.16.0'
 }
 
 group = 'io.sample'
@@ -20,7 +21,8 @@ repositories {
 }
 
 ext {
-    snippetsDir = file('build/generated-snippets')
+    yamlDir = file('build/api-spec')
+    staticDir = file("src/main/resources/static/docs")
 }
 
 dependencies {
@@ -39,29 +41,30 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
     asciidoctorExtensions 'org.springframework.restdocs:spring-restdocs-asciidoctor'
+    testImplementation 'com.epages:restdocs-api-spec-mockmvc:0.16.0'
+}
+
+openapi3 {
+    server = 'https://localhost:8080'
+    title = 'Attendance API'
+    description = '출결 관리 API'
+    version = '0.1.0'
+    format = 'yaml'
 }
 
 tasks.named('test') {
     useJUnitPlatform()
-    outputs.dir snippetsDir
 }
 
-/* [AsciiDoctor:Spring RETS Docs] Start */
-asciidoctor {
-    configurations $/asciidoctorExtensions/$
-    inputs.dir snippetsDir
-    dependsOn test
-    baseDirFollowsSourceFile()
-}
-
+/* [restdocs-api-spec: openapi3] Start */
 task copyDocument(type: Copy) {
-    dependsOn asciidoctor
+    dependsOn 'openapi3'
 
-    from "${asciidoctor.outputDir}"
-    into file("src/main/resources/static/docs")
+    from "${yamlDir}"
+    into "${staticDir}"
 }
 
 build {
     dependsOn copyDocument
 }
-/* [AsciiDoctor:Spring RETS Docs] End */
+/* [restdocs-api-spec: openapi3] End */
