@@ -11,11 +11,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
     produces = MediaType.TEXT_HTML_VALUE
 )
 public class ApiDocsUiController {
-    private static final String DOCS_PATH = "docs/index.html";
+    private static final String DOCS_PATH = "docs/redoc-static.html";
 
     @GetMapping
     public String docs() {
-        System.out.println("요청");
         return DOCS_PATH;
     }
 }

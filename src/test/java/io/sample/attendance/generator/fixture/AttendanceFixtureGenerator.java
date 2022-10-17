@@ -13,6 +13,7 @@ import org.springframework.boot.test.context.TestComponent;
 @TestComponent
 public class AttendanceFixtureGenerator {
     private static final LocalDate today = LocalDate.now();
+    private static final LocalDate yesterday = today.minusDays(1);
     private static final LocalDate nextDay = today.plusDays(1);
 
     private final AttendanceRepo attendanceRepo;
@@ -22,26 +23,26 @@ public class AttendanceFixtureGenerator {
     }
 
     public static Attendance 추가_근무가_없는_출결_생성() {
-        final LocalDateTime startAt = LocalDateTime.of(today, LocalTime.of(9, ZERO));
-        final LocalDateTime endAt = LocalDateTime.of(today, LocalTime.of(18, ZERO));
+        final LocalDateTime startAt = LocalDateTime.of(yesterday, LocalTime.of(9, ZERO));
+        final LocalDateTime endAt = LocalDateTime.of(yesterday, LocalTime.of(18, ZERO));
         return Attendance.of(startAt, endAt);
     }
 
     public static Attendance 연장근무가_포함된_출결_생성() {
-        final LocalDateTime startAt = LocalDateTime.of(today, LocalTime.of(9, ZERO));
-        final LocalDateTime endAt = LocalDateTime.of(today, LocalTime.of(22, ZERO));
+        final LocalDateTime startAt = LocalDateTime.of(yesterday, LocalTime.of(9, ZERO));
+        final LocalDateTime endAt = LocalDateTime.of(yesterday, LocalTime.of(22, ZERO));
         return Attendance.of(startAt, endAt);
     }
 
     public static Attendance 야간근무가_포함된_출결_생성() {
-        final LocalDateTime startAt = LocalDateTime.of(today, LocalTime.of(9, ZERO));
-        final LocalDateTime endAt = LocalDateTime.of(today, LocalTime.of(23, 30));
+        final LocalDateTime startAt = LocalDateTime.of(yesterday, LocalTime.of(9, ZERO));
+        final LocalDateTime endAt = LocalDateTime.of(yesterday, LocalTime.of(23, 30));
         return Attendance.of(startAt, endAt);
     }
 
     public static Attendance 연장근무와_야간근무가_포함된_출결_생성() {
-        final LocalDateTime startAt = LocalDateTime.of(today, LocalTime.of(5, ZERO));
-        final LocalDateTime endAt = LocalDateTime.of(nextDay, LocalTime.of(1, ZERO));
+        final LocalDateTime startAt = LocalDateTime.of(yesterday, LocalTime.of(5, ZERO));
+        final LocalDateTime endAt = LocalDateTime.of(today, LocalTime.of(1, ZERO));
         return Attendance.of(startAt, endAt);
     }
 

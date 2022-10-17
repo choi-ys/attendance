@@ -8,7 +8,6 @@ import static io.sample.attendance.generator.docs.common.CommonFieldDescriptor.c
 import static io.sample.attendance.generator.docs.common.CommonFieldDescriptor.invalidErrorFieldWithPath;
 import static io.sample.attendance.generator.docs.common.CommonHeaderSnippetGenerator.defaultRequestHeaderSnippet;
 import static io.sample.attendance.generator.docs.common.CommonHeaderSnippetGenerator.defaultResponseHeaderSnippet;
-import static io.sample.attendance.generator.docs.custom.EnumDocumentLinkGenerator.enumLinkGenerator;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
@@ -16,7 +15,7 @@ import static org.springframework.restdocs.request.RequestDocumentation.paramete
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
 
-import io.sample.attendance.generator.docs.custom.EnumDocumentLinkGenerator.TargetEnum;
+import com.epages.restdocs.apispec.ResourceSnippetParameters;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -127,7 +126,7 @@ class AttendanceFieldDescriptor {
             fieldWithPath("extraWorks[*].endAt").description("추가 근무 종료 시간"),
             fieldWithPath("extraWorks[*].workDuration.hour").description("추가 근무 소요 시간"),
             fieldWithPath("extraWorks[*].workDuration.minute").description("추가 근무 소요 분"),
-            fieldWithPath("extraWorks[*].extraWorkType").description(enumLinkGenerator(TargetEnum.EXTRA_WORK_TYPE)),
+            fieldWithPath("extraWorks[*].extraWorkType").description("추가 근무 타입 코드"),
             fieldWithPath("extraWorks[*].extraPay").description("추가 수당")
         );
     }

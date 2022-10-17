@@ -1,11 +1,12 @@
 package io.sample.attendance.config.docs;
 
-import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper.document;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.modifyUris;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 
+import com.epages.restdocs.apispec.ResourceSnippet;
 import org.springframework.restdocs.mockmvc.RestDocumentationResultHandler;
 import org.springframework.restdocs.operation.preprocess.OperationRequestPreprocessor;
 import org.springframework.restdocs.operation.preprocess.OperationResponsePreprocessor;
@@ -16,7 +17,7 @@ public interface ApiDocumentUtils {
     String BASE_HOST = "attendance.io";
     String DOCUMENT_IDENTIFIER = "{class-name}/{method-name}";
 
-    private static OperationRequestPreprocessor getDocumentRequest() {
+    static OperationRequestPreprocessor getDocumentRequest() {
         return preprocessRequest(
             modifyUris()
                 .scheme(scheme())
@@ -25,7 +26,7 @@ public interface ApiDocumentUtils {
             prettyPrint());
     }
 
-    private static OperationResponsePreprocessor getDocumentResponse() {
+    static OperationResponsePreprocessor getDocumentResponse() {
         return preprocessResponse(
             modifyUris()
                 .scheme(scheme())
@@ -34,12 +35,17 @@ public interface ApiDocumentUtils {
             prettyPrint());
     }
 
-    static RestDocumentationResultHandler createDocument(Snippet... snippets) {
-        return document(DOCUMENT_IDENTIFIER,
+    static RestDocumentationResultHandler createDocumentBySnippets(Snippet... snippets) {
+        return document(
+            DOCUMENT_IDENTIFIER,
             getDocumentRequest(),
             getDocumentResponse(),
             snippets
         );
+    }
+
+    static RestDocumentationResultHandler createDocumentByResourceSnippet(ResourceSnippet resourceSnippet) {
+        return document(DOCUMENT_IDENTIFIER, resourceSnippet);
     }
 
     private static String scheme() {

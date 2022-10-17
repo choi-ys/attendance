@@ -20,7 +20,6 @@ public class CommonFieldDescriptor {
 
     public static List<FieldDescriptor> invalidErrorFieldWithPath() {
         return Arrays.asList(
-            fieldWithPath("errorDetails[*]").description("에러 상세 정보 배열"),
             fieldWithPath("errorDetails[*].object").description("에러 객체명"),
             fieldWithPath("errorDetails[*].field").description("에러 필드"),
             fieldWithPath("errorDetails[*].code").description("에러 상세 코드"),

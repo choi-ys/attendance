@@ -4,6 +4,7 @@ import static io.sample.attendance.generator.docs.AttendanceDocsGenerator.emptyR
 import static io.sample.attendance.generator.docs.AttendanceDocsGenerator.getAnAttendanceDocument;
 import static io.sample.attendance.generator.docs.AttendanceDocsGenerator.getAttendancesDocument;
 import static io.sample.attendance.generator.docs.AttendanceDocsGenerator.invalidRegisterAttendanceRequestDocument;
+import static io.sample.attendance.generator.docs.AttendanceDocsGenerator.notFoundAttendanceRequestDocument;
 import static io.sample.attendance.generator.docs.AttendanceDocsGenerator.saveAttendanceDocument;
 import static io.sample.attendance.generator.fixture.AttendanceFixtureGenerator.야간근무가_포함된_출결_요청_생성;
 import static io.sample.attendance.generator.fixture.AttendanceFixtureGenerator.연장근무가_포함된_출결_요청_생성;
@@ -34,7 +35,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
 @DisplayName("API:Attendance")
-class AttendanceControllerTest extends SpringBootTestBase {
+class AttendanceApi extends SpringBootTestBase {
     public static final String ATTENDANCE_BASE_URL = "/attendance";
     public static final String GET_AN_ATTENDANCE_URL = "/attendance/{id}";
     public static final String GET_MONTHLY_ATTENDANCE_URL = ATTENDANCE_BASE_URL.concat("/monthly");
@@ -53,7 +54,7 @@ class AttendanceControllerTest extends SpringBootTestBase {
 
     @Test
     @DisplayName("[201:POST]추가 근무가 있는 출결 등록")
-    public void registerAttendanceWithExtraWorks() throws Exception {
+    public void 출결_등록() throws Exception {
         // When
         ResultActions 출결_등록_응답 = 출결_등록_요청(연장근무와_야간근무가_포함된_출결_요청_생성());
 
@@ -68,7 +69,7 @@ class AttendanceControllerTest extends SpringBootTestBase {
     }
 
     private void 출결_등록_응답_검증(ResultActions resultActions) throws Exception {
-        resultActions.andDo(print())
+        resultActions
             .andExpect(status().isCreated())
             .andExpect(header().exists(HttpHeaders.LOCATION));
     }
@@ -111,7 +112,7 @@ class AttendanceControllerTest extends SpringBootTestBase {
 
     @Test
     @DisplayName("[400:POST]요청값이 없는 출결 등록")
-    public void throwException_WhenEmptyAttendanceRequest() throws Exception {
+    public void 요청값이_없는_출결_등록() throws Exception {
         // When
         ResultActions 요청값이_없는_출결_등록_응답 = 출결_등록_요청(null);
 
@@ -138,30 +139,30 @@ class AttendanceControllerTest extends SpringBootTestBase {
         ResultActions 요청값이_유효하지_않은_출결_등록_응답 = 출결_등록_요청(요청값이_유효하지_않은_출결_등록_요청);
 
         // Then
-        요청값이_유효하지_않은_출결_등록_응답_검증(요청값이_유효하지_않은_출결_등록_응답);
-        요청값이_유효하지_않은_출결_등록_문서_생성(요청값이_유효하지_않은_출결_등록_응답);
-    }
-
-    private void 요청값이_유효하지_않은_출결_등록_응답_검증(ResultActions resultActions) throws Exception {
-        resultActions.andExpect(status().isBadRequest());
-    }
-
-    private void 요청값이_유효하지_않은_출결_등록_문서_생성(ResultActions resultActions) throws Exception {
-        resultActions.andDo(invalidRegisterAttendanceRequestDocument());
+        요청값이_유효하지_않은_응답_검증(요청값이_유효하지_않은_출결_등록_응답);
     }
 
     @Test
     @DisplayName("[400:POST]올바르지 않은 출결 등록")
-    public void throwException_WhenInvalidAttendanceRequest() throws Exception {
+    public void 올바르지_않은_출결_등록() throws Exception {
         // Given
-        final LocalDateTime 현재_시간 = LocalDateTime.now();
+        final LocalDateTime 현재_시간 = LocalDateTime.now().plusDays(1);
         AttendanceRequest 출근시간과_퇴근시간이_같은_출결_등록_요청 = AttendanceRequest.of(현재_시간, 현재_시간);
 
         // When
         ResultActions 출근시간과_퇴근시간이_같은_출결_등록_응답 = 출결_등록_요청(출근시간과_퇴근시간이_같은_출결_등록_요청);
 
         // Then
-        요청값이_유효하지_않은_출결_등록_응답_검증(출근시간과_퇴근시간이_같은_출결_등록_응답);
+        요청값이_유효하지_않은_응답_검증(출근시간과_퇴근시간이_같은_출결_등록_응답);
+        요청값이_유효하지_않은_출결_등록_문서_생성(출근시간과_퇴근시간이_같은_출결_등록_응답);
+    }
+
+    private void 요청값이_유효하지_않은_응답_검증(ResultActions resultActions) throws Exception {
+        resultActions.andExpect(status().isBadRequest());
+    }
+
+    private void 요청값이_유효하지_않은_출결_등록_문서_생성(ResultActions resultActions) throws Exception {
+        resultActions.andDo(invalidRegisterAttendanceRequestDocument());
     }
 
     @Test
@@ -180,7 +181,7 @@ class AttendanceControllerTest extends SpringBootTestBase {
         연장근무와_야간근무가_포함된_출결_조회_문서_생성(연장근무와_야간근무가_포함된_출결_조회_응답);
     }
 
-    private ResultActions 근무_기록_조회_요청(Long id) throws Exception {
+    private ResultActions 근무_기록_조회_요청(Object id) throws Exception {
         return get(GET_AN_ATTENDANCE_URL, id);
     }
 
@@ -190,6 +191,39 @@ class AttendanceControllerTest extends SpringBootTestBase {
 
     private void 연장근무와_야간근무가_포함된_출결_조회_문서_생성(ResultActions resultActions) throws Exception {
         resultActions.andDo(getAnAttendanceDocument());
+    }
+
+    @Test
+    @DisplayName("[400:GET]출결 번호의 자료형이 잘못된 출결 조회 요청")
+    public void throwException_WhenNotExistAttendance2() throws Exception {
+        // When
+        ResultActions 조회하지_않는_출결_조회_응답 = 근무_기록_조회_요청("ㅇ");
+
+        // Then
+        요청값이_유효하지_않은_응답_검증(조회하지_않는_출결_조회_응답);
+        조회하지_않는_출결_등록_문서_생성(조회하지_않는_출결_조회_응답);
+    }
+
+    @Test
+    @DisplayName("[404:GET] 조회하지 않는 출결 조회")
+    public void throwException_WhenNotExistAttendance() throws Exception {
+        // Given
+        final Long 조회하지_않는_출결_번호 = 0L;
+
+        // When
+        ResultActions 조회하지_않는_출결_조회_응답 = 근무_기록_조회_요청(조회하지_않는_출결_번호);
+
+        // Then
+        조회하지_않는_출결_등록_응답_검증(조회하지_않는_출결_조회_응답);
+        조회하지_않는_출결_등록_문서_생성(조회하지_않는_출결_조회_응답);
+    }
+
+    private void 조회하지_않는_출결_등록_응답_검증(ResultActions resultActions) throws Exception {
+        resultActions.andDo(print()).andExpect(status().isNotFound());
+    }
+
+    private void 조회하지_않는_출결_등록_문서_생성(ResultActions resultActions) throws Exception {
+        resultActions.andDo(notFoundAttendanceRequestDocument());
     }
 
     @Test
