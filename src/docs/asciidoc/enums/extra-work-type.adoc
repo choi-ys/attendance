@@ -1,5 +1,0 @@
-:doctype: book
-:icons: font
-
-[[extra-work-type]]
-include::{snippets}/common-docs-snippet-controller-test/enum-docs/enum-response-fields-extraWorkType.adoc[]

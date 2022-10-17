@@ -2,7 +2,6 @@ plugins {
     id 'org.springframework.boot' version '2.7.3'
     id 'io.spring.dependency-management' version '1.0.13.RELEASE'
     id 'java'
-    id 'org.asciidoctor.jvm.convert' version '3.3.2'
     id 'com.epages.restdocs-api-spec' version '0.16.0'
 }
 
@@ -39,11 +38,14 @@ dependencies {
     testCompileOnly 'org.projectlombok:lombok'
     testAnnotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
-    asciidoctorExtensions 'org.springframework.restdocs:spring-restdocs-asciidoctor'
     testImplementation 'com.epages:restdocs-api-spec-mockmvc:0.16.0'
 }
 
+tasks.named('test') {
+    useJUnitPlatform()
+}
+
+/* [restdocs-api-spec: openapi3] Start */
 openapi3 {
     server = 'https://localhost:8080'
     title = 'Attendance API'
@@ -52,11 +54,6 @@ openapi3 {
     format = 'yaml'
 }
 
-tasks.named('test') {
-    useJUnitPlatform()
-}
-
-/* [restdocs-api-spec: openapi3] Start */
 task copyDocument(type: Copy) {
     dependsOn 'openapi3'
 

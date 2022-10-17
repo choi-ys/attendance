@@ -9,3 +9,7 @@ spring:
     properties:
       hibernate:
         default_batch_fetch_size: 100
+
+  jackson:
+    serialization:
+      INDENT_OUTPUT: true
