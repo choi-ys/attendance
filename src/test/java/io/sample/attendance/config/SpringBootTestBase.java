@@ -15,12 +15,11 @@ import org.springframework.test.context.TestConstructor;
 import org.springframework.test.context.TestConstructor.AutowireMode;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.MultiValueMap;
 
 @SpringBootTest
-@AutoConfigureMockMvc
+@AutoConfigureMockMvc(printOnlyOnFailure = false)
 @TestConstructor(autowireMode = AutowireMode.ALL)
 @AutoConfigureRestDocs
 @Transactional
@@ -44,7 +43,7 @@ public class SpringBootTestBase {
 
     @SneakyThrows
     public <T> ResultActions post(String urlTemplate, T body, Object... path) {
-        return mockMvc.perform(MockMvcRequestBuilders.post(urlTemplate, path)
+        return mockMvc.perform(RestDocumentationRequestBuilders.post(urlTemplate, path)
             .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(body))
@@ -52,7 +51,7 @@ public class SpringBootTestBase {
     }
 
     public ResultActions get(String urlTemplate) throws Exception {
-        return mockMvc.perform(MockMvcRequestBuilders.get(urlTemplate)
+        return mockMvc.perform(RestDocumentationRequestBuilders.get(urlTemplate)
             .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.APPLICATION_JSON)
         );
@@ -66,7 +65,7 @@ public class SpringBootTestBase {
     }
 
     public ResultActions get(String urlTemplate, MultiValueMap<String, String> paramMap) throws Exception {
-        return mockMvc.perform(MockMvcRequestBuilders.get(urlTemplate)
+        return mockMvc.perform(RestDocumentationRequestBuilders.get(urlTemplate)
             .params(paramMap)
             .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.APPLICATION_JSON)
@@ -74,7 +73,7 @@ public class SpringBootTestBase {
     }
 
     public ResultActions delete(String urlTemplate, Object... path) throws Exception {
-        return mockMvc.perform(MockMvcRequestBuilders.delete(urlTemplate, path)
+        return mockMvc.perform(RestDocumentationRequestBuilders.delete(urlTemplate, path)
             .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.APPLICATION_JSON)
         );
