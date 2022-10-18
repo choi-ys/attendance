@@ -3,8 +3,8 @@ package io.sample.attendance.generator.fixture;
 import static org.hibernate.type.IntegerType.ZERO;
 
 import io.sample.attendance.model.domain.Attendance;
-import io.sample.attendance.model.dto.AttendanceDto.AttendanceRequest;
 import io.sample.attendance.model.domain.repo.AttendanceRepo;
+import io.sample.attendance.model.dto.AttendanceDto.AttendanceRequest;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -14,7 +14,7 @@ import org.springframework.boot.test.context.TestComponent;
 public class AttendanceFixtureGenerator {
     private static final LocalDate today = LocalDate.now();
     private static final LocalDate yesterday = today.minusDays(1);
-    private static final LocalDate nextDay = today.plusDays(1);
+    private static final LocalDate twoDaysAgo = today.minusDays(2);
 
     private final AttendanceRepo attendanceRepo;
 
@@ -41,8 +41,8 @@ public class AttendanceFixtureGenerator {
     }
 
     public static Attendance 연장근무와_야간근무가_포함된_출결_생성() {
-        final LocalDateTime startAt = LocalDateTime.of(yesterday, LocalTime.of(5, ZERO));
-        final LocalDateTime endAt = LocalDateTime.of(today, LocalTime.of(1, ZERO));
+        final LocalDateTime startAt = LocalDateTime.of(twoDaysAgo, LocalTime.of(5, ZERO));
+        final LocalDateTime endAt = LocalDateTime.of(yesterday, LocalTime.of(1, ZERO));
         return Attendance.of(startAt, endAt);
     }
 
